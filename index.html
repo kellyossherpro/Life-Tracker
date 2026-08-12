@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Life Index</title>
 <meta name="description" content="A private, phone-first app that holds your whole life — beautifully in order.">
-<meta name="theme-color" content="#8E6BFF">
+<meta name="theme-color" content="#BFA6FF">
+<meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Life Index">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
@@ -39,38 +40,7 @@
     --star:rgba(150,120,220,.55);
     --good:#39b57e; --warn:#e08a3c; --danger:#e26d8a;
     --chip:rgba(255,255,255,.7);
-  }
-  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
-    --lavender:#8E6BFF; --pink:#FF6EC7; --pink-soft:#FAD6FF;
-    --mint:#B8F1D9; --blue:#7DE9FF; --yellow:#FFE3A3;
-    --bg-0:#161329; --bg-1:#1D1B2E; --bg-2:#241a3a;
-    --ink:#ede7ff; --ink-soft:#b7abdd; --ink-faint:#8b7fb8;
-    --card:rgba(255,255,255,.06); --card-2:rgba(255,255,255,.04);
-    --border:rgba(255,255,255,.12); --border-2:rgba(255,255,255,.08);
-    --shadow:0 10px 34px rgba(0,0,0,.45);
-    --shadow-sm:0 6px 18px rgba(0,0,0,.4);
-    --grad:linear-gradient(135deg,#8E6BFF 0%,#FF6EC7 100%);
-    --grad-cool:linear-gradient(135deg,#7DE9FF 0%,#8E6BFF 100%);
-    --nav-bg:rgba(29,27,46,.72);
-    --star:rgba(255,255,255,.85);
-    --good:#68e0a8; --warn:#ffc07a; --danger:#ff8fb0;
-    --chip:rgba(255,255,255,.08);
-  }}
-  :root[data-theme="dark"]{
-    --lavender:#8E6BFF; --pink:#FF6EC7; --pink-soft:#FAD6FF;
-    --mint:#B8F1D9; --blue:#7DE9FF; --yellow:#FFE3A3;
-    --bg-0:#161329; --bg-1:#1D1B2E; --bg-2:#241a3a;
-    --ink:#ede7ff; --ink-soft:#b7abdd; --ink-faint:#8b7fb8;
-    --card:rgba(255,255,255,.06); --card-2:rgba(255,255,255,.04);
-    --border:rgba(255,255,255,.12); --border-2:rgba(255,255,255,.08);
-    --shadow:0 10px 34px rgba(0,0,0,.45);
-    --shadow-sm:0 6px 18px rgba(0,0,0,.4);
-    --grad:linear-gradient(135deg,#8E6BFF 0%,#FF6EC7 100%);
-    --grad-cool:linear-gradient(135deg,#7DE9FF 0%,#8E6BFF 100%);
-    --nav-bg:rgba(29,27,46,.72);
-    --star:rgba(255,255,255,.85);
-    --good:#68e0a8; --warn:#ffc07a; --danger:#ff8fb0;
-    --chip:rgba(255,255,255,.08);
+    color-scheme: light;
   }
 
   *{box-sizing:border-box}
@@ -228,6 +198,74 @@
   .soon-tag{display:inline-block; margin-top:14px; font-size:12px; font-weight:600; padding:6px 14px; border-radius:999px;
     background:var(--grad); color:#fff; box-shadow:var(--shadow-sm)}
 
+  /* Recipes */
+  .r-grid{display:flex; flex-direction:column; gap:14px}
+  .r-card{padding:0; overflow:hidden; cursor:pointer; transition:transform .12s ease}
+  .r-card:active{transform:scale(.99)}
+  .r-photo{position:relative; height:150px; background:var(--grad-cool); display:grid; place-items:center; font-size:52px}
+  .r-photo img{width:100%; height:100%; object-fit:cover; display:block}
+  .r-fav{position:absolute; top:12px; right:12px; width:38px; height:38px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,.85); box-shadow:var(--shadow-sm); font-size:17px; display:grid; place-items:center}
+  .r-body{padding:14px 16px 16px}
+  .r-body .rn{font-family:var(--font-display); font-weight:700; font-size:18px; margin:0 0 8px}
+  .r-stats{display:flex; gap:8px; flex-wrap:wrap}
+  .r-stat{display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:500; color:var(--ink-soft);
+    background:var(--card-2); border:1px solid var(--border-2); padding:5px 10px; border-radius:999px}
+  .r-stat b{color:var(--ink); font-weight:700}
+
+  /* recipe detail */
+  .r-hero{height:210px; border-radius:24px; overflow:hidden; position:relative; background:var(--grad-cool);
+    display:grid; place-items:center; font-size:74px; box-shadow:var(--shadow); margin-bottom:8px}
+  .r-hero img{width:100%; height:100%; object-fit:cover}
+  .r-hero .r-fav{width:44px;height:44px;font-size:20px}
+  .r-title{font-family:var(--font-display); font-weight:700; font-size:26px; margin:14px 2px 4px}
+  .r-sub{font-size:13px; color:var(--ink-soft); margin:0 2px 14px}
+  .r-metrics{display:flex; gap:10px; margin:0 0 6px}
+  .r-metric{flex:1; text-align:center; background:var(--card); border:1px solid var(--border); border-radius:18px; padding:13px 8px; box-shadow:var(--shadow-sm)}
+  .r-metric .mv{font-family:var(--font-display); font-weight:700; font-size:18px}
+  .r-metric .mk{font-size:11px; color:var(--ink-soft); margin-top:2px}
+  .ing-list{display:flex; flex-direction:column}
+  .ing{display:flex; align-items:center; gap:10px; padding:11px 2px; font-size:14.5px}
+  .ing + .ing{border-top:1px solid var(--border-2)}
+  .ing .dot{width:8px;height:8px;border-radius:50%;background:var(--lavender);flex:0 0 auto}
+  .ing .in{flex:1}
+  .ing .iq{color:var(--ink-soft); font-size:13px}
+  .ing .ic2{font-weight:700; font-variant-numeric:tabular-nums}
+  .total-row{display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:14px; border-top:1px dashed var(--border)}
+  .total-row .tk{font-size:13px; color:var(--ink-soft)}
+  .total-row .tv{font-family:var(--font-display); font-weight:700; font-size:22px}
+  .steps-list{margin:0; padding:0; list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:12px}
+  .steps-list li{counter-increment:s; display:flex; gap:12px; font-size:14.5px; line-height:1.5}
+  .steps-list li::before{content:counter(s); flex:0 0 auto; width:26px; height:26px; border-radius:9px; background:var(--grad);
+    color:#fff; font-weight:700; font-size:13px; display:grid; place-items:center; font-family:var(--font-body)}
+
+  /* ingredient editor rows */
+  .ing-edit{display:flex; flex-direction:column; gap:8px}
+  .ing-row{display:grid; grid-template-columns:1fr 58px 44px 66px 30px; gap:6px; align-items:center}
+  .ing-row input{width:100%; font-family:var(--font-body); font-size:13.5px; color:var(--ink);
+    background:var(--card); border:1px solid var(--border); border-radius:11px; padding:10px 9px; outline:none}
+  .ing-row input:focus{border-color:var(--lavender)}
+  .ing-row .rm{width:30px;height:30px;border:none;background:transparent;color:var(--danger);font-size:18px;cursor:pointer;border-radius:8px}
+  .ing-head{display:grid; grid-template-columns:1fr 58px 44px 66px 30px; gap:6px; font-size:10.5px; color:var(--ink-faint);
+    font-weight:600; text-transform:uppercase; letter-spacing:.03em; padding:0 2px}
+  .add-ing{align-self:flex-start; margin-top:2px}
+  .live-total{display:flex; justify-content:space-between; align-items:center; background:var(--card-2);
+    border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-top:10px; font-size:14px}
+  .live-total b{font-family:var(--font-display); font-size:18px}
+
+  /* photo picker */
+  .photo-pick{height:130px; border-radius:18px; border:1.5px dashed var(--border-strong,var(--border)); cursor:pointer;
+    display:grid; place-items:center; text-align:center; color:var(--ink-soft); font-size:13px; overflow:hidden; position:relative;
+    background:var(--card-2)}
+  .photo-pick img{width:100%;height:100%;object-fit:cover}
+  .photo-pick .ph-x{position:absolute; top:8px; right:8px; width:30px;height:30px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.9); box-shadow:var(--shadow-sm); cursor:pointer; font-size:15px}
+
+  /* rating stars */
+  .stars{display:flex; gap:4px; font-size:24px}
+  .stars .st{cursor:pointer; filter:grayscale(1) opacity(.4)}
+  .stars .st.on{filter:none}
+
   /* Bottom nav */
   .nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; padding:0 0 max(12px,env(safe-area-inset-bottom))}
   .nav-inner{display:flex; align-items:center; justify-content:space-around; gap:2px; width:min(500px,calc(100% - 24px));
@@ -274,7 +312,7 @@
     <button class="nav-item" data-nav="/"><span class="ic">🏠</span>Home</button>
     <button class="nav-item" data-nav="/vault"><span class="ic">🗝️</span>Vault</button>
     <button class="fab" id="fab" aria-label="Quick add">＋</button>
-    <button class="nav-item" data-nav="/food"><span class="ic">🍳</span>Food</button>
+    <button class="nav-item" data-nav="/recipes"><span class="ic">🍳</span>Recipes</button>
     <button class="nav-item" data-nav="/more"><span class="ic">✨</span>More</button>
   </div>
 </nav>
@@ -290,11 +328,12 @@
   var app=$('#app');
 
   /* ---------- storage ---------- */
-  var K={vault:'lifeindex.vault', settings:'lifeindex.settings', seeded:'lifeindex.seeded'};
+  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', settings:'lifeindex.settings', seeded:'lifeindex.seeded'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-  var settings=load(K.settings,{name:'Kelly', theme:'system', currency:'R'});
+  var settings=load(K.settings,{name:'Kelly', currency:'R'});
   var vault=load(K.vault,[]);
+  var recipes=load(K.recipes,[]);
 
   var CAT={
     medical:{label:'Medical Aid',icon:'🛡️',b:'b-mint'},
@@ -318,7 +357,20 @@
       {id:uid(),category:'medical',title:'Discovery Health',provider:'Discovery',contact:'0860 99 88 77',accountNo:'1234567890',idNumber:'',monthlyCost:1850,renewalDate:d(23),notes:'Classic Comprehensive plan'},
       {id:uid(),category:'internet',title:'Fibre',provider:'Vumatel / Afrihost',contact:'',accountNo:'AFH-882140',idNumber:'',monthlyCost:699,renewalDate:d(40),notes:'100Mbps uncapped'}
     ];
-    save(K.vault,vault); save(K.seeded,true);
+    recipes=[
+      {id:uid(),name:'Creamy Chicken Pasta',photo:'',favourite:true,servings:4,prepTime:10,cookTime:20,
+        ingredients:[
+          {name:'Chicken breast',qty:'400',unit:'g',cost:32},
+          {name:'Pasta',qty:'250',unit:'g',cost:6.5},
+          {name:'Cream',qty:'200',unit:'ml',cost:10},
+          {name:'Parmesan',qty:'50',unit:'g',cost:6},
+          {name:'Garlic & onion',qty:'1',unit:'ea',cost:4},
+          {name:'Olive oil & spices',qty:'',unit:'',cost:5}
+        ],
+        steps:'Boil the pasta until al dente, then drain.\nFry the chicken with garlic and onion until golden.\nStir in the cream and simmer for 5 minutes.\nToss through the pasta, top with parmesan, and serve.',
+        rating:5,lastMade:''}
+    ];
+    save(K.vault,vault); save(K.recipes,recipes); save(K.seeded,true);
   }
 
   function uid(){return 'x'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3)}
@@ -327,13 +379,10 @@
   function daysUntil(iso){if(!iso)return null; var t=new Date(iso+'T00:00:00'); var now=new Date(); now.setHours(0,0,0,0); return Math.round((t-now)/86400000)}
   function whenText(n){if(n==null)return ''; if(n<0)return Math.abs(n)+'d ago'; if(n===0)return 'today'; if(n===1)return 'tomorrow'; return 'in '+n+' days'}
 
-  /* ---------- theme ---------- */
-  function applyTheme(){
-    var t=settings.theme;
-    if(t==='system'){document.documentElement.removeAttribute('data-theme');}
-    else{document.documentElement.setAttribute('data-theme',t);}
-  }
-  applyTheme();
+  /* ---------- recipe helpers ---------- */
+  function recipeCost(r){return (r.ingredients||[]).reduce(function(s,i){return s+(Number(i.cost)||0)},0)}
+  function perServing(r){var s=Number(r.servings)||0; return s? recipeCost(r)/s : recipeCost(r)}
+  function totalTime(r){return (Number(r.prepTime)||0)+(Number(r.cookTime)||0)}
 
   /* ---------- toast ---------- */
   var toastT;
@@ -382,8 +431,8 @@
     '<div class="section-label">💫 Quick Add</div>'+
     '<div class="qa-grid">'+
       '<div class="qa" data-nav-go="/vault/new"><span class="e b-lav">🗝️</span>Add to Vault</div>'+
-      '<div class="qa" data-soon="Foods & Recipes"><span class="e b-pink">🍳</span>Add Food</div>'+
-      '<div class="qa" data-soon="Weight tracking"><span class="e b-mint">⚖️</span>Log Weight</div>'+
+      '<div class="qa" data-nav-go="/recipes/new"><span class="e b-pink">🍳</span>Add Recipe</div>'+
+      '<div class="qa" data-nav-go="/body"><span class="e b-mint">🌸</span>My Body</div>'+
       '<div class="qa" data-soon="Reminders"><span class="e b-yellow">🔔</span>Add Reminder</div>'+
     '</div>';
   }
@@ -463,10 +512,6 @@
     '<div class="screen-head"><div><h2 class="title">More ✨</h2><div class="sub">Make it yours.</div></div></div>'+
     '<div class="section-label">You</div>'+
     '<div class="card tight"><div class="field" style="margin:0"><label>Your name</label><input id="s-name" value="'+esc(settings.name)+'"></div></div>'+
-    '<div class="section-label">Appearance</div>'+
-    '<div class="card tight"><div class="field" style="margin:0"><label>Theme</label><select id="s-theme">'+
-      ['system','light','dark'].map(function(t){return '<option value="'+t+'" '+(settings.theme===t?'selected':'')+'>'+(t==='system'?'Match my phone':t.charAt(0).toUpperCase()+t.slice(1))+'</option>'}).join('')+
-      '</select></div></div>'+
     '<div class="section-label">Your data</div>'+
     '<div class="card tight" style="display:flex;flex-direction:column;gap:10px">'+
       '<button class="btn ghost" id="s-export">⬇️ Export a backup file</button>'+
@@ -476,12 +521,131 @@
     '</div>'+
     '<div class="section-label">Modules</div>'+
     '<div class="card tight"><div class="snap">'+
-      '<div class="snap-row"><div class="bubble b-lav">🗝️</div><div class="txt"><div class="big">Personal Vault</div><div class="lead">Ready now · Phase 1</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
-      '<div class="snap-row"><div class="bubble b-pink">🍳</div><div class="txt"><div class="big">Foods & Recipes</div><div class="lead">Phase 2</div></div><span class="pill">Next</span></div>'+
+      '<div class="snap-row" data-nav-go="/vault" style="cursor:pointer"><div class="bubble b-lav">🗝️</div><div class="txt"><div class="big">Personal Vault</div><div class="lead">Ready now · Phase 1</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row" data-nav-go="/recipes" style="cursor:pointer"><div class="bubble b-pink">🍳</div><div class="txt"><div class="big">Recipes</div><div class="lead">Ready now · Phase 2</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row"><div class="bubble b-mint">💸</div><div class="txt"><div class="big">Spending & Time</div><div class="lead">Phase 3</div></div><span class="pill">Soon</span></div>'+
-      '<div class="snap-row"><div class="bubble b-yellow">🩸</div><div class="txt"><div class="big">Period & Weight</div><div class="lead">Phase 4</div></div><span class="pill">Soon</span></div>'+
+      '<div class="snap-row" data-nav-go="/body" style="cursor:pointer"><div class="bubble b-yellow">🌸</div><div class="txt"><div class="big">My Body</div><div class="lead">Weight · periods · moods · Phase 4</div></div><span class="pill">Soon</span></div>'+
     '</div></div>'+
     '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index — made with 💜 for '+esc(settings.name)+'</div>';
+  }
+
+  /* ---------- recipes screens ---------- */
+  function foodEmoji(name){var n=(name||'').toLowerCase();
+    if(/pasta|noodle|spagh/.test(n))return '🍝'; if(/pizza/.test(n))return '🍕';
+    if(/salad|veg|green/.test(n))return '🥗'; if(/chicken|meat|steak|beef/.test(n))return '🍗';
+    if(/rice|curry/.test(n))return '🍛'; if(/soup|stew/.test(n))return '🍲';
+    if(/cake|dessert|sweet|choc/.test(n))return '🍰'; if(/breakfast|egg|toast/.test(n))return '🍳';
+    if(/burger/.test(n))return '🍔'; if(/fish|seafood/.test(n))return '🐟'; if(/smoothie|juice|drink/.test(n))return '🥤';
+    return '🍽️';}
+
+  function recipeCardPhoto(r,big){
+    var emoji=foodEmoji(r.name);
+    var inner=r.photo? '<img src="'+esc(r.photo)+'" alt="">' : emoji;
+    return inner+'<button class="r-fav" data-fav="'+r.id+'" aria-label="Favourite">'+(r.favourite?'💖':'🤍')+'</button>';
+  }
+
+  function screenRecipes(){
+    var q=(window.__rq||'').trim().toLowerCase();
+    var items=recipes.slice();
+    if(q) items=items.filter(function(r){return (r.name||'').toLowerCase().indexOf(q)>-1});
+    items.sort(function(a,b){return (b.favourite?1:0)-(a.favourite?1:0) || (a.name||'').localeCompare(b.name||'')});
+
+    var favCount=recipes.filter(function(r){return r.favourite}).length;
+    var list = recipes.length===0 ?
+      '<div class="empty"><div class="em">🍳</div><h3>No recipes yet</h3><p>Add your favourite meals — with ingredients, time and cost worked out for you.</p><div class="center-x" style="margin-top:16px"><button class="btn sm" data-nav-go="/recipes/new">✨ Add your first recipe</button></div></div>'
+      : (items.length===0 ? '<div class="empty" style="padding:30px"><div class="em">🔍</div><p>No recipes match that.</p></div>' :
+        '<div class="r-grid">'+items.map(function(r){
+          return '<div class="card r-card" data-view="'+r.id+'">'+
+            '<div class="r-photo">'+recipeCardPhoto(r)+'</div>'+
+            '<div class="r-body"><p class="rn">'+esc(r.name)+'</p>'+
+              '<div class="r-stats">'+
+                '<span class="r-stat">⏱ <b>'+totalTime(r)+'</b> min</span>'+
+                '<span class="r-stat">💰 <b>'+money(perServing(r))+'</b> /serving</span>'+
+                '<span class="r-stat">🍽 <b>'+(Number(r.servings)||1)+'</b></span>'+
+              '</div></div>'+
+          '</div>';
+        }).join('')+'</div>');
+
+    return ''+
+    '<div class="screen-head"><div><h2 class="title">Recipes 🍳</h2><div class="sub">'+(recipes.length?recipes.length+' saved · '+favCount+' loved':'Your living cookbook')+'</div></div>'+
+      '<button class="iconbtn" data-nav-go="/recipes/new">＋</button></div>'+
+    (recipes.length? '<div class="search"><span class="mag">🔍</span><input id="rq" placeholder="Search recipes..." value="'+esc(window.__rq||'')+'"></div>':'')+
+    list;
+  }
+
+  function screenRecipeView(id){
+    var r=recipes.find(function(x){return x.id===id});
+    if(!r) return screenNotFound();
+    var ings=(r.ingredients||[]).filter(function(i){return (i.name||'').trim()||Number(i.cost)});
+    var sub=[]; if(r.favourite) sub.push('💖 A favourite');
+    if(r.lastMade){var n=daysUntil(r.lastMade); sub.push('Last made '+(n===0?'today':whenText(n)));}
+    var steps=(r.steps||'').split(/\n+/).map(function(s){return s.trim()}).filter(Boolean);
+
+    return ''+
+    '<div class="screen-head" style="margin-bottom:10px"><button class="iconbtn" data-nav-go="/recipes">‹</button>'+
+      '<button class="iconbtn" data-redit="'+r.id+'">✏️</button></div>'+
+    '<div class="r-hero">'+recipeCardPhoto(r)+'</div>'+
+    '<h1 class="r-title">'+esc(r.name)+'</h1>'+
+    (sub.length?'<p class="r-sub">'+sub.join('  ·  ')+'</p>':'<div style="height:6px"></div>')+
+    '<div class="r-metrics">'+
+      '<div class="r-metric"><div class="mv">'+totalTime(r)+' min</div><div class="mk">⏱ Total time</div></div>'+
+      '<div class="r-metric"><div class="mv">'+money(perServing(r))+'</div><div class="mk">💰 Per serving</div></div>'+
+      '<div class="r-metric"><div class="mv">'+(Number(r.servings)||1)+'</div><div class="mk">🍽 Servings</div></div>'+
+    '</div>'+
+    '<div class="section-label">🧺 Ingredients</div>'+
+    '<div class="card"><div class="ing-list">'+
+      (ings.length? ings.map(function(i){
+        return '<div class="ing"><span class="dot"></span><span class="in">'+esc(i.name||'—')+
+          (i.qty||i.unit?' <span class="iq">'+esc((i.qty||'')+' '+(i.unit||'')).trim()+'</span>':'')+'</span>'+
+          '<span class="ic2">'+(Number(i.cost)?money(i.cost):'—')+'</span></div>';
+      }).join('') : '<div class="ing"><span class="in" style="color:var(--ink-soft)">No ingredients yet</span></div>')+
+      '</div>'+
+      '<div class="total-row"><div><div class="tk">Total cost</div></div><div class="tv">'+money(recipeCost(r))+'</div></div>'+
+    '</div>'+
+    (steps.length? '<div class="section-label">👩‍🍳 Method</div><div class="card"><ol class="steps-list">'+steps.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ol></div>':'')+
+    '<div class="form-actions" style="margin-top:18px"><button class="btn" data-cook="'+r.id+'">🍽️ Cook this — mark as made</button></div>';
+  }
+
+  function ingRowHTML(i){ i=i||{};
+    return '<div class="ing-row">'+
+      '<input class="i-name" placeholder="Ingredient" value="'+esc(i.name||'')+'">'+
+      '<input class="i-qty" placeholder="Qty" value="'+esc(i.qty||'')+'">'+
+      '<input class="i-unit" placeholder="Unit" value="'+esc(i.unit||'')+'">'+
+      '<input class="i-cost" inputmode="decimal" placeholder="'+settings.currency+'" value="'+((i.cost!==''&&i.cost!=null)?i.cost:'')+'">'+
+      '<button type="button" class="rm" data-rmrow aria-label="Remove">✕</button>'+
+    '</div>';
+  }
+
+  function screenRecipeForm(id){
+    var r = id? recipes.find(function(x){return x.id===id}) :
+      {name:'',photo:'',favourite:false,servings:'',prepTime:'',cookTime:'',ingredients:[],steps:'',rating:0,lastMade:''};
+    if(!r) return screenNotFound();
+    var ings=(r.ingredients&&r.ingredients.length)?r.ingredients:[{},{}];
+    return ''+
+    '<div class="screen-head"><div><h2 class="title">'+(id?'Edit recipe':'New recipe')+'</h2>'+
+      '<div class="sub">'+(id?'Update your recipe':'Add to your cookbook')+'</div></div>'+
+      '<button class="iconbtn" data-nav-go="/recipes">✕</button></div>'+
+    '<form id="rform">'+
+      '<div class="field"><label>Recipe name</label><input name="name" placeholder="e.g. Creamy Chicken Pasta" value="'+esc(r.name)+'" required></div>'+
+      '<div class="field"><label>Photo <span style="color:var(--ink-faint);font-weight:400">(optional)</span></label>'+
+        '<div class="photo-pick" id="r-photo">'+(r.photo?'<img src="'+esc(r.photo)+'"><button type="button" class="ph-x" id="r-photo-x">✕</button>':'📷&nbsp; Tap to add a photo')+'</div>'+
+        '<input type="file" id="r-photo-file" accept="image/*" class="hidden"><input type="hidden" name="photo" id="r-photo-val" value="'+esc(r.photo)+'"></div>'+
+      '<div class="field"><button type="button" class="btn ghost" id="r-fav-btn">'+(r.favourite?'💖 A favourite':'🤍 Mark as favourite')+'</button>'+
+        '<input type="hidden" name="favourite" id="r-fav-val" value="'+(r.favourite?'1':'')+'"></div>'+
+      '<div class="row2" style="grid-template-columns:1fr 1fr 1fr"><div class="field"><label>Servings</label><input name="servings" inputmode="numeric" placeholder="4" value="'+(r.servings||'')+'"></div>'+
+        '<div class="field"><label>Prep (min)</label><input name="prepTime" inputmode="numeric" placeholder="10" value="'+(r.prepTime||'')+'"></div>'+
+        '<div class="field"><label>Cook (min)</label><input name="cookTime" inputmode="numeric" placeholder="20" value="'+(r.cookTime||'')+'"></div></div>'+
+      '<div class="section-label" style="margin-left:2px">🧺 Ingredients</div>'+
+      '<div class="ing-head"><span>Ingredient</span><span>Qty</span><span>Unit</span><span>Cost</span><span></span></div>'+
+      '<div class="ing-edit" id="ing-edit">'+ings.map(ingRowHTML).join('')+'</div>'+
+      '<button type="button" class="btn ghost sm add-ing" id="add-ing">＋ Add ingredient</button>'+
+      '<div class="live-total"><span>Total cost <span style="color:var(--ink-soft)">(auto)</span></span><b id="ing-total">'+money(recipeCost({ingredients:ings}))+'</b></div>'+
+      '<div class="field" style="margin-top:16px"><label>Method / steps</label><textarea name="steps" placeholder="One step per line...">'+esc(r.steps)+'</textarea></div>'+
+      '<div class="field"><label>Your rating</label><div class="stars" id="r-stars">'+[1,2,3,4,5].map(function(n){return '<span class="st '+(n<=(r.rating||0)?'on':'')+'" data-star="'+n+'">⭐</span>'}).join('')+'</div>'+
+        '<input type="hidden" name="rating" id="r-rating-val" value="'+(r.rating||0)+'"></div>'+
+      '<div class="form-actions"><button class="btn" type="submit">'+(id?'💾 Save recipe':'✨ Add recipe')+'</button>'+
+        (id?'<button class="btn danger" type="button" data-rdel="'+id+'">Delete recipe</button>':'')+'</div>'+
+    '</form>';
   }
 
   /* ---------- render ---------- */
@@ -493,7 +657,11 @@
     else if(path==='/vault') html=screenVault();
     else if(path==='/vault/new') html=screenVaultForm(null);
     else if(seg[1]==='vault'&&seg[2]==='edit'&&seg[3]) html=screenVaultForm(seg[3]);
-    else if(path==='/food') html=screenComingSoon('🍳','Foods & Recipes','Your living cookbook — recipes with ingredients, prep time, and cost per meal worked out for you.','Phase 2');
+    else if(path==='/recipes') html=screenRecipes();
+    else if(path==='/recipes/new') html=screenRecipeForm(null);
+    else if(seg[1]==='recipes'&&seg[2]==='edit'&&seg[3]) html=screenRecipeForm(seg[3]);
+    else if(seg[1]==='recipes'&&seg[2]==='view'&&seg[3]) html=screenRecipeView(seg[3]);
+    else if(path==='/body') html=screenComingSoon('🌸','My Body','Log your weight, periods, moods and anything about how you feel — all in one gentle, private place.','Phase 4');
     else if(path==='/money') html=screenComingSoon('💸','Spending','Upload statements, see where your money goes, and catch overspending.','Phase 3');
     else if(path==='/more') html=screenMore();
     else html=screenNotFound();
@@ -533,16 +701,63 @@
       };
     }
 
+    // Recipes: search + list + view interactions
+    var rq=$('#rq'); if(rq){rq.oninput=function(){window.__rq=rq.value; var scroll=window.scrollY; render(); window.scrollTo(0,scroll); var f=$('#rq'); if(f){f.focus(); f.setSelectionRange(f.value.length,f.value.length)}};}
+    document.querySelectorAll('[data-view]').forEach(function(el){el.onclick=function(){go('/recipes/view/'+el.getAttribute('data-view'))}});
+    document.querySelectorAll('[data-fav]').forEach(function(el){el.onclick=function(ev){ev.stopPropagation(); var rid=el.getAttribute('data-fav'); var r=recipes.find(function(x){return x.id===rid}); if(r){r.favourite=!r.favourite; save(K.recipes,recipes); render();}}});
+    document.querySelectorAll('[data-redit]').forEach(function(el){el.onclick=function(){go('/recipes/edit/'+el.getAttribute('data-redit'))}});
+    document.querySelectorAll('[data-cook]').forEach(function(el){el.onclick=function(){var rid=el.getAttribute('data-cook'); var r=recipes.find(function(x){return x.id===rid}); if(r){r.lastMade=new Date().toISOString().slice(0,10); save(K.recipes,recipes); toast('🍽️ Enjoy, '+(settings.name||'you')+'! 💜'); render();}}});
+
+    var rform=$('#rform'); if(rform){
+      var recalc=function(){var t=0; rform.querySelectorAll('.i-cost').forEach(function(c){t+=parseFloat(c.value)||0}); var el=$('#ing-total'); if(el) el.textContent=money(t);};
+      var wireRow=function(row){ row.querySelector('[data-rmrow]').onclick=function(){row.remove(); recalc();};
+        row.querySelectorAll('.i-cost').forEach(function(c){c.oninput=recalc;}); };
+      rform.querySelectorAll('.ing-row').forEach(wireRow);
+      var addBtn=$('#add-ing'); if(addBtn) addBtn.onclick=function(){var wrap=$('#ing-edit'); var tmp=document.createElement('div'); tmp.innerHTML=ingRowHTML({}); var row=tmp.firstChild; wrap.appendChild(row); wireRow(row); row.querySelector('.i-name').focus();};
+
+      var pv=$('#r-photo-val'), pfile=$('#r-photo-file'), pbox=$('#r-photo');
+      var bindPhotoX=function(){var x=$('#r-photo-x'); if(x) x.onclick=function(ev){ev.stopPropagation(); pv.value=''; pbox.innerHTML='📷&nbsp; Tap to add a photo';};};
+      if(pbox){ pbox.onclick=function(){ if(pv.value) return; pfile.click(); }; bindPhotoX();
+        pfile.onchange=function(){var f=pfile.files[0]; if(!f)return; if(f.size>2.5*1024*1024){toast('Try a smaller photo (under 2.5MB) 💜');return;}
+          var rd=new FileReader(); rd.onload=function(){pv.value=rd.result; pbox.innerHTML='<img src="'+pv.value+'"><button type="button" class="ph-x" id="r-photo-x">✕</button>'; bindPhotoX();}; rd.readAsDataURL(f);};
+      }
+      var favBtn=$('#r-fav-btn'), favVal=$('#r-fav-val');
+      if(favBtn) favBtn.onclick=function(){var on=favVal.value!=='1'; favVal.value=on?'1':''; favBtn.textContent=on?'💖 A favourite':'🤍 Mark as favourite';};
+      var ratingVal=$('#r-rating-val');
+      rform.querySelectorAll('[data-star]').forEach(function(s){s.onclick=function(){var n=parseInt(s.getAttribute('data-star'),10);
+        if(parseInt(ratingVal.value,10)===n) n=0; ratingVal.value=n;
+        rform.querySelectorAll('[data-star]').forEach(function(x){x.classList.toggle('on', parseInt(x.getAttribute('data-star'),10)<=n)});};});
+
+      rform.onsubmit=function(ev){ev.preventDefault();
+        var seg=path.split('/'); var id=(seg[1]==='recipes'&&seg[2]==='edit')?seg[3]:null;
+        var fd=new FormData(rform); var ingredients=[];
+        rform.querySelectorAll('.ing-row').forEach(function(row){
+          var name=(row.querySelector('.i-name').value||'').trim(); var cost=parseFloat(row.querySelector('.i-cost').value)||0;
+          if(name||cost) ingredients.push({name:name,qty:(row.querySelector('.i-qty').value||'').trim(),unit:(row.querySelector('.i-unit').value||'').trim(),cost:cost});
+        });
+        var obj={name:(fd.get('name')||'').trim(),photo:fd.get('photo')||'',favourite:fd.get('favourite')==='1',
+          servings:parseFloat(fd.get('servings'))||0,prepTime:parseFloat(fd.get('prepTime'))||0,cookTime:parseFloat(fd.get('cookTime'))||0,
+          ingredients:ingredients,steps:(fd.get('steps')||'').trim(),rating:parseInt(fd.get('rating'),10)||0};
+        if(!obj.name){toast('Give your recipe a name ✨');return;}
+        if(id){var i=recipes.findIndex(function(x){return x.id===id}); if(i>-1) recipes[i]=Object.assign({},recipes[i],obj);}
+        else{obj.id=uid(); obj.lastMade=''; recipes.unshift(obj);}
+        save(K.recipes,recipes); toast(id?'Recipe saved 💜':'Added to your cookbook ✨'); go(id?'/recipes/view/'+id:'/recipes');
+      };
+      var rdel=$('[data-rdel]',rform); if(rdel) rdel.onclick=function(){
+        if(confirm('Delete this recipe? This can’t be undone.')){var did=rdel.getAttribute('data-rdel');
+          recipes=recipes.filter(function(x){return x.id!==did}); save(K.recipes,recipes); toast('Deleted'); go('/recipes');}
+      };
+    }
+
     // More screen
     var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
-    var st=$('#s-theme'); if(st) st.onchange=function(){settings.theme=st.value; save(K.settings,settings); applyTheme(); toast('Theme updated ✨')};
     var ex=$('#s-export'); if(ex) ex.onclick=exportData;
     var im=$('#s-import'); var file=$('#s-file');
     if(im&&file){im.onclick=function(){file.click()}; file.onchange=function(){importData(file.files[0])};}
   }
 
   function exportData(){
-    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault};
+    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='life-index-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
@@ -552,8 +767,8 @@
     r.onload=function(){try{var data=JSON.parse(r.result);
       if(!data||!Array.isArray(data.vault)) throw 0;
       if(!confirm('Restore this backup? It will replace what’s here now.')) return;
-      vault=data.vault; if(data.settings) settings=Object.assign(settings,data.settings);
-      save(K.vault,vault); save(K.settings,settings); applyTheme(); toast('Restored 💜'); go('/');
+      vault=data.vault; if(Array.isArray(data.recipes)) recipes=data.recipes; if(data.settings) settings=Object.assign(settings,data.settings);
+      save(K.vault,vault); save(K.recipes,recipes); save(K.settings,settings); toast('Restored 💜'); go('/');
     }catch(e){toast('That file didn’t look right 😕')}};
     r.readAsText(f);
   }
@@ -564,8 +779,8 @@
     s.innerHTML='<div class="grab"></div><h3>Quick Add ✨</h3><p class="sd">What would you like to capture?</p>'+
       '<div class="qa-grid" style="margin-bottom:6px">'+
         '<div class="qa" data-q="/vault/new"><span class="e b-lav">🗝️</span>Vault entry</div>'+
-        '<div class="qa" data-qsoon="Foods & Recipes"><span class="e b-pink">🍳</span>Food / recipe</div>'+
-        '<div class="qa" data-qsoon="Weight tracking"><span class="e b-mint">⚖️</span>Weight</div>'+
+        '<div class="qa" data-q="/recipes/new"><span class="e b-pink">🍳</span>Recipe</div>'+
+        '<div class="qa" data-q="/body"><span class="e b-mint">🌸</span>My Body</div>'+
         '<div class="qa" data-qsoon="Reminders"><span class="e b-yellow">🔔</span>Reminder</div>'+
       '</div>';
     $('#backdrop').classList.add('open'); s.classList.add('open');

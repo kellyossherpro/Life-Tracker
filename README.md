@@ -39,16 +39,17 @@ encrypted on-device before it ever syncs.
 
 - **Phase 0 — Foundation:** installable app shell, navigation, offline storage, login, encrypted sync.
 - **Phase 1 — Personal Info Vault:** medical aid, insurance, internet, rent, car, ID & documents; locked sensitive fields; renewal/rent reminders.
-- **Phase 2 — Foods & Recipes:** ingredients → auto cost & time, favorites, favorite shops.
+- **Phase 2 — Recipes:** ingredients → auto cost & time, favourites, ratings, photos.
 - **Phase 3 — Money & Time:** bank-statement import (CSV then PDF) + budgets + Time/Habits + Home Dashboard.
-- **Phase 4 — Body:** Period & Cycle (log, symptoms, predictions) + Weight (trends).
+- **Phase 4 — My Body:** weight, periods, moods and anything about how you feel — one gentle place.
 
 ## Style direction
 
-Kelly's taste: **cute, pretty colours, sparkles** — playful delight is a first-class
-design goal (it's what keeps the app in daily use), balanced against readability for
-reference data. Palette, fonts, and animation to be finalized from Kelly's own
-inspiration images. Sensitive vault text stays high-contrast and legible regardless.
+Kelly's taste (from her inspiration boards): **dreamy, sparkly, cute** — soft pastel
+"Galaxy" palette, Playfair Display + Poppins + Dancing Script, frosted rounded cards,
+soft 3D icons, tasteful sparkle. **Light theme only** (per Kelly's choice — dark mode
+removed). Full palette in `design/DESIGN_SYSTEM.md`. Sensitive vault text stays
+high-contrast and legible.
 
 ## Data models (Phase 1)
 
@@ -63,4 +64,9 @@ inspiration images. Sensitive vault text stays high-contrast and legible regardl
 
 ## Status
 
-Blueprint approved-in-progress. Next step: build **Phase 0 + Phase 1** (pending Kelly's go-ahead).
+- ✅ **Phase 0 — Foundation** built: installable PWA shell, hash-router navigation, offline service worker, local-first storage, JSON export/import backup.
+- ✅ **Phase 1 — Vault** built: add/edit/delete, category filters, search, masked sensitive fields.
+- ✅ **Phase 2 — Recipes** built: recipe list, detail, add/edit with dynamic ingredients, auto cost & per-serving, favourites, ratings, photos, "cook this".
+- ⬜ Next: **Phase 3** (Spending & Time) or **Phase 4** (My Body), plus real cloud sync + install via GitHub Pages.
+
+The app lives in `index.html` (self-contained) with `manifest.webmanifest`, `sw.js`, and `icons/`.
