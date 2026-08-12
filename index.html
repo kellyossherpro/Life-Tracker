@@ -342,6 +342,52 @@
     border:1px solid var(--border); border-radius:11px; padding:9px 11px; outline:none}
   .bud-cat{display:flex; align-items:center; gap:10px; margin-bottom:8px; font-weight:600; font-size:14px}
 
+  /* To-Do */
+  .todo-add{display:flex; gap:8px; margin-bottom:14px}
+  .todo-add input{flex:1; font-family:var(--font-body); font-size:15px; color:var(--ink); background:var(--card);
+    border:1px solid var(--border); border-radius:14px; padding:13px 14px; outline:none}
+  .todo-add input:focus{border-color:var(--lavender)}
+  .todo-add .btn{width:auto; flex:0 0 auto; padding:13px 18px}
+  .todo-row{display:flex; align-items:center; gap:13px; padding:13px 4px}
+  .todo-row + .todo-row{border-top:1px solid var(--border-2)}
+  .check{width:26px; height:26px; border-radius:50%; border:2px solid var(--lavender); flex:0 0 auto; cursor:pointer;
+    display:grid; place-items:center; font-size:14px; color:#fff; transition:background .15s}
+  .check.on{background:var(--grad); border-color:transparent}
+  .todo-txt{flex:1; font-size:15px; line-height:1.35}
+  .todo-row.done .todo-txt{text-decoration:line-through; color:var(--ink-faint)}
+  .todo-due{font-size:11.5px; font-weight:600; color:var(--ink-soft); white-space:nowrap}
+  .todo-due.over{color:var(--danger)}
+  .todo-del{border:none; background:transparent; color:var(--ink-faint); font-size:15px; cursor:pointer}
+  .star-btn{border:none;background:transparent;font-size:16px;cursor:pointer;filter:grayscale(1) opacity(.4)}
+  .star-btn.on{filter:none}
+
+  /* Reminders */
+  .rem-row{display:flex; align-items:center; gap:13px; padding:12px 4px}
+  .rem-row + .rem-row{border-top:1px solid var(--border-2)}
+  .rem-date{flex:0 0 auto; width:52px; text-align:center; border-radius:13px; padding:7px 4px; background:var(--card-2); border:1px solid var(--border-2)}
+  .rem-date .rd-d{font-family:var(--font-display); font-weight:800; font-size:19px; line-height:1}
+  .rem-date .rd-m{font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft)}
+  .rem-row .meta{flex:1; min-width:0}
+  .rem-row .rt{font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .rem-row .rs{font-size:12.5px; color:var(--ink-soft)}
+  .rem-row .rwhen{font-size:11.5px; font-weight:700; white-space:nowrap; padding:4px 9px; border-radius:999px; background:var(--chip); color:var(--ink-soft)}
+  .rem-row .rwhen.soon{color:var(--danger)}
+
+  /* Habits */
+  .habit-card{display:flex; align-items:center; gap:14px; padding:15px}
+  .habit-card .he{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:22px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--mint),var(--blue)); box-shadow:var(--shadow-sm)}
+  .habit-card .hmeta{flex:1; min-width:0}
+  .habit-card .hn{font-weight:600; font-size:15.5px}
+  .habit-card .hs{font-size:12.5px; color:var(--ink-soft); margin-top:1px}
+  .habit-check{width:44px;height:44px;border-radius:14px;border:2px solid var(--lavender);background:transparent;cursor:pointer;
+    display:grid;place-items:center;font-size:20px;color:#fff;flex:0 0 auto;transition:background .15s}
+  .habit-check.on{background:var(--grad); border-color:transparent}
+  .habit-week{display:flex; gap:5px; margin-top:7px}
+  .habit-week .wd{width:15px;height:15px;border-radius:5px;background:var(--card-2);border:1px solid var(--border-2)}
+  .habit-week .wd.on{background:var(--lavender);border-color:transparent}
+  .flame{color:var(--warn); font-weight:700}
+
   /* Bottom nav */
   .nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; padding:0 0 max(12px,env(safe-area-inset-bottom))}
   .nav-inner{display:flex; align-items:center; justify-content:space-around; gap:2px; width:min(500px,calc(100% - 24px));
@@ -379,6 +425,33 @@
   .form-actions{display:flex; flex-direction:column; gap:10px; margin-top:6px}
   .hidden{display:none!important}
   .center-x{display:flex; justify-content:center}
+
+  /* Lock screen */
+  #lockscreen{position:fixed; inset:0; z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center;
+    padding:36px 26px; text-align:center;
+    background:radial-gradient(120% 80% at 100% 0%, var(--bg-2) 0%, transparent 55%), linear-gradient(180deg,var(--bg-0),var(--bg-1) 55%,var(--bg-2));}
+  #lockscreen.show{display:flex}
+  .lock-logo{font-size:50px; margin-bottom:10px; filter:drop-shadow(0 8px 16px rgba(150,120,220,.3))}
+  .lock-title{font-family:var(--font-display); font-weight:700; font-size:23px; margin:0 0 4px}
+  .lock-sub{font-size:14px; color:var(--ink-soft); margin:0 0 22px; min-height:20px}
+  .pin-dots{display:flex; gap:15px; margin-bottom:28px}
+  .pin-dots .d{width:15px; height:15px; border-radius:50%; border:2px solid var(--lavender); transition:background .15s, transform .15s}
+  .pin-dots .d.on{background:var(--lavender); transform:scale(1.05)}
+  .pin-dots.err{animation:shakex .38s}
+  @keyframes shakex{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}60%{transform:translateX(9px)}}
+  @media (prefers-reduced-motion:reduce){ .pin-dots.err{animation:none} }
+  .keypad{display:grid; grid-template-columns:repeat(3,70px); gap:16px; justify-content:center}
+  .key{width:70px; height:70px; border-radius:50%; border:1px solid var(--border); background:var(--card); font-size:24px; font-weight:600;
+    color:var(--ink); cursor:pointer; font-family:var(--font-body); box-shadow:var(--shadow-sm); transition:transform .1s ease}
+  .key:active{transform:scale(.93); background:var(--pink-soft)}
+  .key.blank{background:transparent; border:none; box-shadow:none; cursor:default}
+  .key.fn{font-size:20px; color:var(--ink-soft)}
+  .lock-link{margin-top:24px; font-size:13.5px; color:var(--ink-soft); text-decoration:underline; cursor:pointer; background:none; border:none; font-family:var(--font-body)}
+  #privacy-veil{position:fixed; inset:0; z-index:150; display:none; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(120% 80% at 100% 0%, var(--bg-2) 0%, transparent 55%), linear-gradient(180deg,var(--bg-0),var(--bg-2));}
+  body.veiled #privacy-veil{display:flex}
+  #privacy-veil .pv-logo{font-size:60px; filter:drop-shadow(0 8px 16px rgba(150,120,220,.3))}
+  #privacy-veil .pv-name{font-family:var(--font-display); font-weight:700; font-size:22px; color:var(--lavender); margin-top:8px}
 </style>
 
 <div class="app" id="app"></div>
@@ -396,6 +469,8 @@
 <div class="backdrop" id="backdrop"></div>
 <div class="sheet" id="sheet"></div>
 <div class="toast" id="toast"></div>
+<div id="privacy-veil"><div class="pv-logo">🪐</div><div class="pv-name">Life Index</div></div>
+<div id="lockscreen"></div>
 
 <script>
 (function(){
@@ -404,7 +479,7 @@
   var app=$('#app');
 
   /* ---------- storage ---------- */
-  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
+  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
   var settings=load(K.settings,{name:'Kelly', currency:'R'});
@@ -414,6 +489,9 @@
   if(!body.weights)body.weights=[]; if(!body.periods)body.periods=[]; if(!body.moods)body.moods=[];
   var tx=load(K.tx,[]);
   var budgets=load(K.budgets,{});
+  var todos=load(K.todos,[]);
+  var reminders=load(K.reminders,[]);
+  var habits=load(K.habits,[]);
 
   var SPEND_CATS={
     groceries:{label:'Groceries',icon:'🛒',color:'#8E6BFF'},
@@ -448,6 +526,13 @@
       ['Netflix',99,'entertainment',1],['Spotify',65,'entertainment',1],['Vodacom',599,'bills',2],['Dischem',245,'health',6]];
     tx=seedTx.map(function(r){return {id:uid(),date:mk(r[3]),desc:r[0],amount:r[1],type:'expense',category:r[2]};});
     save(K.tx,tx); save(K.seededTx,true);
+  }
+  if(!load('lifeindex.seededX',false)){
+    todos=[{id:uid(),text:'Renew car licence',done:false,star:true,createdAt:Date.now()},
+           {id:uid(),text:'Buy a birthday gift',done:false,star:false,createdAt:Date.now()-1}];
+    reminders=[{id:uid(),type:'reminder',title:'Pay rent',date:(function(){var t=new Date();t.setDate(t.getDate()+5);return t.toISOString().slice(0,10);})(),note:'',todoId:''}];
+    habits=[{id:uid(),name:'Drink water',emoji:'💧',history:{}},{id:uid(),name:'Move my body',emoji:'🏃',history:{}}];
+    save(K.todos,todos); save(K.reminders,reminders); save(K.habits,habits); save('lifeindex.seededX',true);
   }
 
   var CAT={
@@ -528,7 +613,8 @@
     vault.forEach(function(e){ if(e.renewalDate){ var n=daysUntil(e.renewalDate); if(n!=null&&n>=0){ var c=CAT[e.category]||CAT.other;
       items.push({icon:c.icon,b:c.b,title:e.title,label:(e.category==='insurance'&&e.subtype)?e.subtype+' insurance':c.label,days:n}); } } });
     var np=nextPeriodInfo(); if(np&&np.days!=null&&np.days>=0&&np.days<=45) items.push({icon:'🌸',b:'b-pink',title:'Period',label:'Likely to start',days:np.days});
-    items.sort(function(a,b){return a.days-b.days}); items=items.slice(0,4);
+    reminders.forEach(function(r){ var nx=remNext(r); var n=daysUntil(nx); if(n!=null&&n>=0&&n<=45){ var ty=REM_TYPE[r.type]||REM_TYPE.reminder; items.push({icon:ty.icon,b:'b-pink',title:r.title,label:ty.label,days:n}); } });
+    items.sort(function(a,b){return a.days-b.days}); items=items.slice(0,5);
     var monthly=vault.reduce(function(s,e){return s+(Number(e.monthlyCost)||0)},0);
     var thisMonthKey=(function(){var n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
     var spentThisMonth=tx.filter(function(t){return (t.date||'').slice(0,7)===thisMonthKey && t.type!=='income'}).reduce(function(s,t){return s+(Number(t.amount)||0)},0);
@@ -554,10 +640,12 @@
 
     '<div class="section-label">💫 Quick Add</div>'+
     '<div class="qa-grid">'+
-      '<div class="qa" data-nav-go="/vault/new"><span class="e b-lav">🗝️</span>Add to Vault</div>'+
-      '<div class="qa" data-nav-go="/recipes/new"><span class="e b-pink">🍳</span>Add Recipe</div>'+
-      '<div class="qa" data-nav-go="/body"><span class="e b-mint">🌸</span>My Body</div>'+
+      '<div class="qa" data-nav-go="/todos"><span class="e b-lav">📝</span>To-Do</div>'+
+      '<div class="qa" data-nav-go="/reminders/new"><span class="e b-pink">🔔</span>Reminder</div>'+
       '<div class="qa" data-nav-go="/money/new"><span class="e b-yellow">💸</span>Add Expense</div>'+
+      '<div class="qa" data-nav-go="/body"><span class="e b-mint">🌸</span>My Body</div>'+
+      '<div class="qa" data-nav-go="/recipes/new"><span class="e b-pink">🍳</span>Add Recipe</div>'+
+      '<div class="qa" data-nav-go="/vault/new"><span class="e b-lav">🗝️</span>Vault</div>'+
     '</div>';
   }
 
@@ -648,6 +736,15 @@
     '<div class="screen-head"><div><h2 class="title">More ✨</h2><div class="sub">Make it yours.</div></div></div>'+
     '<div class="section-label">You</div>'+
     '<div class="card tight"><div class="field" style="margin:0"><label>Your name</label><input id="s-name" value="'+esc(settings.name)+'"></div></div>'+
+    '<div class="section-label">🔒 Privacy &amp; lock</div>'+
+    '<div class="card tight" style="display:flex;flex-direction:column;gap:10px">'+
+      (hasPIN()
+        ? '<button class="btn ghost" id="s-changepin">🔢 Change PIN</button>'+
+          (bioSupported()? (settings.bio? '<button class="btn ghost" id="s-biooff">👆 Turn off fingerprint / Face ID</button>' : '<button class="btn" id="s-bioon">👆 Enable fingerprint / Face ID</button>') : '<div class="locknote" style="margin:0 2px">Fingerprint unlock needs the installed app on a supported phone.</div>')+
+          '<button class="btn ghost" id="s-removepin">Turn off app lock</button>'
+        : '<button class="btn" id="s-setpin">🔒 Set up a PIN lock</button>')+
+      '<div class="locknote" style="margin:2px 2px 0">A lock keeps the app private from anyone who picks up your phone. Your data always stays on this device — never uploaded. If you forget the PIN you can reset (this clears data), so keep an export backup.</div>'+
+    '</div>'+
     '<div class="section-label">Your data</div>'+
     '<div class="card tight" style="display:flex;flex-direction:column;gap:10px">'+
       '<button class="btn ghost" id="s-export">⬇️ Export a backup file</button>'+
@@ -661,6 +758,9 @@
       '<div class="snap-row" data-nav-go="/recipes" style="cursor:pointer"><div class="bubble b-pink">🍳</div><div class="txt"><div class="big">Recipes</div><div class="lead">Ready now · Phase 2</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/money" style="cursor:pointer"><div class="bubble b-mint">💸</div><div class="txt"><div class="big">Spending</div><div class="lead">Ready now · Phase 3</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/body" style="cursor:pointer"><div class="bubble b-yellow">🌸</div><div class="txt"><div class="big">My Body</div><div class="lead">Weight · periods · moods · Phase 4</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row" data-nav-go="/todos" style="cursor:pointer"><div class="bubble b-lav">📝</div><div class="txt"><div class="big">To-Do</div><div class="lead">Your checklist</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row" data-nav-go="/reminders" style="cursor:pointer"><div class="bubble b-pink">🔔</div><div class="txt"><div class="big">Reminders</div><div class="lead">Birthdays · events · nudges</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row" data-nav-go="/habits" style="cursor:pointer"><div class="bubble b-mint">🔥</div><div class="txt"><div class="big">Habits</div><div class="lead">Daily streaks</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
     '</div></div>'+
     '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index — made with 💜 for '+esc(settings.name)+'</div>';
   }
@@ -986,6 +1086,92 @@
     return {added:added,month:lastMonth};
   }
 
+  /* ---------- To-Do ---------- */
+  function screenTodos(){
+    var active=todos.filter(function(t){return !t.done});
+    var done=todos.filter(function(t){return t.done});
+    active.sort(function(a,b){return (b.star?1:0)-(a.star?1:0) || (b.createdAt||0)-(a.createdAt||0)});
+    var row=function(t){return '<div class="todo-row'+(t.done?' done':'')+'">'+
+      '<div class="check'+(t.done?' on':'')+'" data-ttoggle="'+t.id+'">'+(t.done?'✓':'')+'</div>'+
+      '<div class="todo-txt">'+esc(t.text)+'</div>'+
+      (t.done?'':'<button class="star-btn'+(t.star?' on':'')+'" data-tstar="'+t.id+'">⭐</button>')+
+      '<button class="todo-del" data-tdel="'+t.id+'">🗑</button></div>';};
+    var list = todos.length===0
+      ? '<div class="empty" style="padding:34px"><div class="em">📝</div><h3>Nothing to do… yet</h3><p>Add your first task above and tick it off when it’s done ✨</p></div>'
+      : '<div class="card">'+(active.length?active.map(row).join(''):'<div style="text-align:center;color:var(--ink-soft);padding:16px;font-size:14px">All done — nice work! 🎉</div>')+'</div>'+
+        (done.length?'<div class="section-label">Done · '+done.length+'<button class="lock-link" id="clr-done" style="margin-left:auto;color:var(--ink-faint);font-size:12px;text-decoration:none">Clear</button></div><div class="card">'+done.map(row).join('')+'</div>':'');
+    return '<div class="screen-head"><div><h2 class="title">To-Do 📝</h2><div class="sub">'+(active.length?active.length+' to go':(todos.length?'All caught up 🎉':'Your checklist'))+'</div></div></div>'+
+      '<form id="todoform" class="todo-add"><input name="text" placeholder="Add a task…" autocomplete="off"><button class="btn" type="submit">Add</button></form>'+list;
+  }
+
+  /* ---------- Reminders ---------- */
+  var REM_TYPE={birthday:{icon:'🎂',label:'Birthday'},event:{icon:'🎉',label:'Event'},reminder:{icon:'⏰',label:'Reminder'}};
+  function remNext(r){ if(!r.date) return null;
+    if(r.type==='birthday'){ var p=r.date.split('-'); var mm=+p[1],dd=+p[2]; var now=new Date(); now.setHours(0,0,0,0);
+      var cand=new Date(now.getFullYear(),mm-1,dd); if(cand<now) cand=new Date(now.getFullYear()+1,mm-1,dd);
+      return cand.getFullYear()+'-'+String(mm).padStart(2,'0')+'-'+String(dd).padStart(2,'0'); }
+    return r.date;
+  }
+  function remBadge(iso){var d=new Date(iso+'T00:00:00'); return {d:d.getDate(), m:d.toLocaleDateString('en-ZA',{month:'short'})};}
+  function screenReminders(){
+    var items=reminders.map(function(r){var nx=remNext(r); return {r:r,next:nx,days:daysUntil(nx)};}).filter(function(x){return x.next;});
+    items.sort(function(a,b){return (a.days==null?99999:a.days)-(b.days==null?99999:b.days);});
+    var list = reminders.length===0
+      ? '<div class="empty" style="padding:34px"><div class="em">🔔</div><h3>No reminders yet</h3><p>Add birthdays, events, or nudges about your to-dos — I’ll keep them in order.</p><div class="center-x" style="margin-top:16px"><button class="btn sm" data-nav-go="/reminders/new">✨ Add a reminder</button></div></div>'
+      : '<div class="card">'+items.map(function(x){var r=x.r; var b=remBadge(x.next); var ty=REM_TYPE[r.type]||REM_TYPE.reminder;
+          var sub=ty.label; if(r.type==='reminder'&&r.todoId){var td=todos.find(function(t){return t.id===r.todoId}); if(td) sub='⏰ '+td.text;}
+          else if(r.note) sub=ty.label+' · '+r.note;
+          if(r.type==='birthday'&&/^\d{4}/.test(r.date)&&+r.date.slice(0,4)>1900){var age=new Date(x.next).getFullYear()-(+r.date.slice(0,4)); if(age>0&&age<130) sub='🎂 Turns '+age;}
+          return '<div class="rem-row" data-remopen="'+r.id+'"><div class="rem-date"><div class="rd-d">'+b.d+'</div><div class="rd-m">'+b.m+'</div></div>'+
+            '<div class="meta"><div class="rt">'+ty.icon+' '+esc(r.title)+'</div><div class="rs">'+esc(sub)+'</div></div>'+
+            '<div class="rwhen '+(x.days<=7?'soon':'')+'">'+whenText(x.days)+'</div></div>';}).join('')+'</div>';
+    return '<div class="screen-head"><div><h2 class="title">Reminders 🔔</h2><div class="sub">Birthdays, events &amp; nudges.</div></div>'+
+      '<button class="iconbtn" data-nav-go="/reminders/new">＋</button></div>'+list;
+  }
+  function screenReminderForm(id){
+    var r=id? reminders.find(function(x){return x.id===id}) : {type:'reminder',title:'',date:today(),note:'',todoId:''};
+    if(!r) return screenNotFound();
+    var typeOpts=Object.keys(REM_TYPE).map(function(k){return '<option value="'+k+'" '+(r.type===k?'selected':'')+'>'+REM_TYPE[k].icon+'  '+REM_TYPE[k].label+'</option>';}).join('');
+    var active=todos.filter(function(t){return !t.done});
+    var todoOpts='<option value="">— none —</option>'+active.map(function(t){return '<option value="'+t.id+'" '+(r.todoId===t.id?'selected':'')+'>'+esc(t.text.slice(0,40))+'</option>';}).join('');
+    return '<div class="screen-head"><div><h2 class="title">'+(id?'Edit reminder':'New reminder')+'</h2></div>'+
+      '<button class="iconbtn" data-nav-go="/reminders">✕</button></div>'+
+    '<form id="remform">'+
+      '<div class="field"><label>Type</label><select name="type">'+typeOpts+'</select></div>'+
+      '<div class="field"><label>Title</label><input name="title" placeholder="e.g. Mom’s birthday" value="'+esc(r.title)+'" required></div>'+
+      '<div class="field"><label>Date</label><input name="date" type="date" value="'+esc(r.date)+'" required></div>'+
+      '<div class="field"><label>Link to a to-do <span style="color:var(--ink-faint);font-weight:400">(optional)</span></label><select name="todoId">'+todoOpts+'</select></div>'+
+      '<div class="field"><label>Note</label><textarea name="note" placeholder="Anything to remember…">'+esc(r.note)+'</textarea></div>'+
+      '<div class="locknote">🎂 Birthdays repeat every year automatically.</div>'+
+      '<div class="form-actions"><button class="btn" type="submit">'+(id?'💾 Save':'✨ Add reminder')+'</button>'+
+        (id?'<button class="btn danger" type="button" data-remdel="'+id+'">Delete</button>':'')+'</div>'+
+    '</form>';
+  }
+
+  /* ---------- Habits ---------- */
+  function habitEmoji(name){var n=(name||'').toLowerCase();
+    if(/water|drink|hydrat/.test(n))return '💧'; if(/gym|exercise|workout|train|run|walk|steps/.test(n))return '🏃';
+    if(/read|book/.test(n))return '📚'; if(/medit|calm|breath|mindful/.test(n))return '🧘'; if(/sleep|bed/.test(n))return '😴';
+    if(/vitamin|pill|med/.test(n))return '💊'; if(/skin|face/.test(n))return '🧴'; if(/journal|write/.test(n))return '✍️';
+    if(/stretch|yoga/.test(n))return '🤸'; if(/save|money|budget/.test(n))return '💰'; if(/study|learn/.test(n))return '🎓';
+    return '🌟';}
+  function dkey(dt){return dt.toISOString().slice(0,10);}
+  function habitStreak(h){var d=new Date(); d.setHours(0,0,0,0); if(!h.history[dkey(d)]) d.setDate(d.getDate()-1);
+    var s=0; while(h.history[dkey(d)]){s++; d.setDate(d.getDate()-1);} return s;}
+  function screenHabits(){
+    var list = habits.length===0
+      ? '<div class="empty" style="padding:34px"><div class="em">🔥</div><h3>Build a habit</h3><p>Add something you want to do daily — water, movement, journalling — and grow your streak ✨</p></div>'
+      : '<div class="r-grid">'+habits.map(function(h){ if(!h.history)h.history={}; var st=habitStreak(h); var doneToday=!!h.history[dkey(new Date())];
+          var week=''; for(var i=6;i>=0;i--){var d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i); week+='<div class="wd'+(h.history[dkey(d)]?' on':'')+'"></div>';}
+          return '<div class="card habit-card"><div class="he">'+(h.emoji||'🌟')+'</div>'+
+            '<div class="hmeta"><div class="hn">'+esc(h.name)+'</div><div class="hs">'+(st>0?'<span class="flame">🔥 '+st+' day'+(st>1?'s':'')+'</span>':'Start today!')+'</div>'+
+            '<div class="habit-week">'+week+'</div></div>'+
+            '<button class="habit-check'+(doneToday?' on':'')+'" data-hcheck="'+h.id+'">'+(doneToday?'✓':'')+'</button>'+
+            '<button class="todo-del" data-hdel="'+h.id+'" style="margin-left:4px">🗑</button></div>';}).join('')+'</div>';
+    return '<div class="screen-head"><div><h2 class="title">Habits 🔥</h2><div class="sub">Small daily wins.</div></div></div>'+
+      '<form id="habitform" class="todo-add"><input name="name" placeholder="New daily habit…" autocomplete="off"><button class="btn" type="submit">Add</button></form>'+list;
+  }
+
   /* ---------- render ---------- */
   function render(){
     var path=current();
@@ -1004,6 +1190,11 @@
     else if(path==='/money/new') html=screenSpendForm(null);
     else if(seg[1]==='money'&&seg[2]==='edit'&&seg[3]) html=screenSpendForm(seg[3]);
     else if(path==='/money/budgets') html=screenBudgets();
+    else if(path==='/todos') html=screenTodos();
+    else if(path==='/reminders') html=screenReminders();
+    else if(path==='/reminders/new') html=screenReminderForm(null);
+    else if(seg[1]==='reminders'&&seg[2]==='edit'&&seg[3]) html=screenReminderForm(seg[3]);
+    else if(path==='/habits') html=screenHabits();
     else if(path==='/more') html=screenMore();
     else html=screenNotFound();
 
@@ -1141,15 +1332,46 @@
     document.querySelectorAll('[data-budget]').forEach(function(el){el.onchange=function(){var c=el.getAttribute('data-budget'); var v=parseFloat(el.value)||0;
       if(v>0) budgets[c]=v; else delete budgets[c]; save(K.budgets,budgets); el.blur(); setTimeout(render,0);};});
 
+    // To-Do
+    var todoform=$('#todoform'); if(todoform) todoform.onsubmit=function(ev){ev.preventDefault(); var inp=todoform.querySelector('input'); var t=inp.value.trim();
+      if(!t)return; todos.unshift({id:uid(),text:t,done:false,star:false,createdAt:Date.now()}); save(K.todos,todos); render();};
+    document.querySelectorAll('[data-ttoggle]').forEach(function(el){el.onclick=function(){var t=todos.find(function(x){return x.id===el.getAttribute('data-ttoggle')}); if(t){t.done=!t.done; save(K.todos,todos); render();}}});
+    document.querySelectorAll('[data-tstar]').forEach(function(el){el.onclick=function(){var t=todos.find(function(x){return x.id===el.getAttribute('data-tstar')}); if(t){t.star=!t.star; save(K.todos,todos); render();}}});
+    document.querySelectorAll('[data-tdel]').forEach(function(el){el.onclick=function(){todos=todos.filter(function(x){return x.id!==el.getAttribute('data-tdel')}); save(K.todos,todos); render();}});
+    var clrDone=$('#clr-done'); if(clrDone) clrDone.onclick=function(){todos=todos.filter(function(t){return !t.done}); save(K.todos,todos); toast('Cleared'); render();};
+
+    // Reminders
+    document.querySelectorAll('[data-remopen]').forEach(function(el){el.onclick=function(){go('/reminders/edit/'+el.getAttribute('data-remopen'))}});
+    var remform=$('#remform'); if(remform){
+      remform.onsubmit=function(ev){ev.preventDefault(); var seg=path.split('/'); var id=(seg[1]==='reminders'&&seg[2]==='edit')?seg[3]:null;
+        var fd=new FormData(remform); var obj={type:fd.get('type'),title:(fd.get('title')||'').trim(),date:fd.get('date')||'',note:(fd.get('note')||'').trim(),todoId:fd.get('todoId')||''};
+        if(!obj.title){toast('Give it a title ✨');return;} if(!obj.date){toast('Pick a date');return;}
+        if(id){var i=reminders.findIndex(function(x){return x.id===id}); if(i>-1) reminders[i]=Object.assign({},reminders[i],obj);}
+        else{obj.id=uid(); reminders.push(obj);}
+        save(K.reminders,reminders); toast(id?'Saved 💜':'Reminder added ✨'); go('/reminders');};
+      var rd=$('[data-remdel]',remform); if(rd) rd.onclick=function(){if(confirm('Delete this reminder?')){var did=rd.getAttribute('data-remdel'); reminders=reminders.filter(function(x){return x.id!==did}); save(K.reminders,reminders); toast('Deleted'); go('/reminders');}};
+    }
+
+    // Habits
+    var habitform=$('#habitform'); if(habitform) habitform.onsubmit=function(ev){ev.preventDefault(); var inp=habitform.querySelector('input'); var n=inp.value.trim();
+      if(!n)return; habits.push({id:uid(),name:n,emoji:habitEmoji(n),history:{}}); save(K.habits,habits); render();};
+    document.querySelectorAll('[data-hcheck]').forEach(function(el){el.onclick=function(){var h=habits.find(function(x){return x.id===el.getAttribute('data-hcheck')}); if(h){ if(!h.history)h.history={}; var k=dkey(new Date()); if(h.history[k])delete h.history[k]; else h.history[k]=true; save(K.habits,habits); render();}}});
+    document.querySelectorAll('[data-hdel]').forEach(function(el){el.onclick=function(){if(confirm('Delete this habit and its streak?')){habits=habits.filter(function(x){return x.id!==el.getAttribute('data-hdel')}); save(K.habits,habits); render();}}});
+
     // More screen
     var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
+    var setpin=$('#s-setpin'); if(setpin) setpin.onclick=function(){showLock('set')};
+    var chgpin=$('#s-changepin'); if(chgpin) chgpin.onclick=function(){showLock('set')};
+    var rmpin=$('#s-removepin'); if(rmpin) rmpin.onclick=function(){if(confirm('Turn off the app lock? Anyone who opens the app will be able to see your data.')){delete settings.pin; delete settings.bio; save(K.settings,settings); toast('Lock turned off'); render();}};
+    var bioOn=$('#s-bioon'); if(bioOn) bioOn.onclick=enableBiometric;
+    var bioOff=$('#s-biooff'); if(bioOff) bioOff.onclick=function(){delete settings.bio; save(K.settings,settings); toast('Fingerprint turned off'); render();};
     var ex=$('#s-export'); if(ex) ex.onclick=exportData;
     var im=$('#s-import'); var file=$('#s-file');
     if(im&&file){im.onclick=function(){file.click()}; file.onchange=function(){importData(file.files[0])};}
   }
 
   function exportData(){
-    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes,body:body,tx:tx,budgets:budgets};
+    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes,body:body,tx:tx,budgets:budgets,todos:todos,reminders:reminders,habits:habits};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='life-index-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
@@ -1162,8 +1384,9 @@
       vault=data.vault; if(Array.isArray(data.recipes)) recipes=data.recipes;
       if(data.body){ body=data.body; if(!body.weights)body.weights=[]; if(!body.periods)body.periods=[]; if(!body.moods)body.moods=[]; }
       if(Array.isArray(data.tx)) tx=data.tx; if(data.budgets&&typeof data.budgets==='object') budgets=data.budgets;
+      if(Array.isArray(data.todos)) todos=data.todos; if(Array.isArray(data.reminders)) reminders=data.reminders; if(Array.isArray(data.habits)) habits=data.habits;
       if(data.settings) settings=Object.assign(settings,data.settings);
-      save(K.vault,vault); save(K.recipes,recipes); save(K.body,body); save(K.tx,tx); save(K.budgets,budgets); save(K.settings,settings); toast('Restored 💜'); go('/');
+      save(K.vault,vault); save(K.recipes,recipes); save(K.body,body); save(K.tx,tx); save(K.budgets,budgets); save(K.todos,todos); save(K.reminders,reminders); save(K.habits,habits); save(K.settings,settings); toast('Restored 💜'); go('/');
     }catch(e){toast('That file didn’t look right 😕')}};
     r.readAsText(f);
   }
@@ -1173,10 +1396,12 @@
     var s=$('#sheet');
     s.innerHTML='<div class="grab"></div><h3>Quick Add ✨</h3><p class="sd">What would you like to capture?</p>'+
       '<div class="qa-grid" style="margin-bottom:6px">'+
-        '<div class="qa" data-q="/vault/new"><span class="e b-lav">🗝️</span>Vault entry</div>'+
-        '<div class="qa" data-q="/recipes/new"><span class="e b-pink">🍳</span>Recipe</div>'+
-        '<div class="qa" data-q="/body"><span class="e b-mint">🌸</span>My Body</div>'+
+        '<div class="qa" data-q="/todos"><span class="e b-lav">📝</span>To-Do</div>'+
+        '<div class="qa" data-q="/reminders/new"><span class="e b-pink">🔔</span>Reminder</div>'+
         '<div class="qa" data-q="/money/new"><span class="e b-yellow">💸</span>Expense</div>'+
+        '<div class="qa" data-q="/habits"><span class="e b-mint">🔥</span>Habit</div>'+
+        '<div class="qa" data-q="/recipes/new"><span class="e b-pink">🍳</span>Recipe</div>'+
+        '<div class="qa" data-q="/vault/new"><span class="e b-lav">🗝️</span>Vault</div>'+
       '</div>';
     $('#backdrop').classList.add('open'); s.classList.add('open');
     s.querySelectorAll('[data-q]').forEach(function(el){el.onclick=function(){closeSheet(); go(el.getAttribute('data-q'))}});
@@ -1187,10 +1412,99 @@
   $('#backdrop').onclick=closeSheet;
   document.querySelectorAll('[data-nav]').forEach(function(b){b.onclick=function(){go(b.getAttribute('data-nav'))}});
 
+  /* ---------- Lock (PIN + biometric) ---------- */
+  var locked=false, lockMode='unlock', pinBuf='', firstPin='';
+  function hasPIN(){ return !!(settings.pin && settings.pin.hash); }
+  function bioSupported(){ return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create); }
+  function simpleHash(s){ var h=5381; for(var i=0;i<s.length;i++){ h=((h<<5)+h)+s.charCodeAt(i); h|=0; } return 'x'+(h>>>0).toString(16); }
+  function randSalt(){ var a=new Uint8Array(16); (window.crypto||{}).getRandomValues&&crypto.getRandomValues(a); return Array.prototype.map.call(a,function(b){return b.toString(16).padStart(2,'0')}).join('')||String(Math.random()); }
+  function hashPIN(pin,salt){ var msg=salt+':'+pin;
+    if(window.crypto&&crypto.subtle){ return crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg))
+      .then(function(buf){ return Array.prototype.map.call(new Uint8Array(buf),function(b){return b.toString(16).padStart(2,'0')}).join(''); })
+      .catch(function(){ return simpleHash(msg); }); }
+    return Promise.resolve(simpleHash(msg));
+  }
+  function b64u(buf){ var b=btoa(String.fromCharCode.apply(null,new Uint8Array(buf))); return b.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  function unb64u(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4)s+='='; var bin=atob(s),a=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i); return a.buffer; }
+
+  function showLock(mode){ lockMode=mode; pinBuf=''; if(mode==='set')firstPin=''; $('#lockscreen').classList.add('show'); drawLock();
+    if(mode==='unlock'&&settings.bio&&bioSupported()) setTimeout(biometricUnlock,350); }
+  function hideLock(){ $('#lockscreen').classList.remove('show'); }
+  function lock(){ locked=true; showLock('unlock'); }
+  function drawLock(){
+    var titles={unlock:'Welcome back ✨',set:'Create a PIN',confirm:'Confirm your PIN'};
+    var subs={unlock:'Enter your PIN to unlock',set:'Choose a 4-digit code',confirm:'Enter it again to confirm'};
+    var dots=''; for(var i=0;i<4;i++) dots+='<div class="d'+(i<pinBuf.length?' on':'')+'"></div>';
+    var keys=''; ['1','2','3','4','5','6','7','8','9'].forEach(function(n){keys+='<button class="key" data-k="'+n+'">'+n+'</button>';});
+    keys+='<button class="key blank"></button><button class="key" data-k="0">0</button><button class="key fn" data-k="del">⌫</button>';
+    var extra = lockMode==='unlock'
+      ? ((settings.bio&&bioSupported()?'<button class="lock-link" data-bio>👆 Use fingerprint / Face ID</button>':'')+'<button class="lock-link" data-forgot>Forgot your PIN?</button>')
+      : '<button class="lock-link" data-cancelpin>Cancel</button>';
+    $('#lockscreen').innerHTML='<div class="lock-logo">🪐</div><div class="lock-title">'+titles[lockMode]+'</div>'+
+      '<div class="lock-sub" id="lock-sub">'+subs[lockMode]+'</div><div class="pin-dots" id="pin-dots">'+dots+'</div>'+
+      '<div class="keypad">'+keys+'</div>'+extra;
+    var ls=$('#lockscreen');
+    ls.querySelectorAll('[data-k]').forEach(function(b){b.onclick=function(){pressKey(b.getAttribute('data-k'))};});
+    var fg=ls.querySelector('[data-forgot]'); if(fg) fg.onclick=forgotPin;
+    var cp=ls.querySelector('[data-cancelpin]'); if(cp) cp.onclick=function(){pinBuf='';lockMode='unlock';hideLock();render();};
+    var bb=ls.querySelector('[data-bio]'); if(bb) bb.onclick=biometricUnlock;
+  }
+  function updateDots(){ var el=$('#pin-dots'); if(!el)return; var ds=el.children; for(var i=0;i<ds.length;i++) ds[i].classList.toggle('on', i<pinBuf.length); }
+  function pressKey(k){ var d=$('#pin-dots'); if(d)d.classList.remove('err');
+    if(k==='del'){ pinBuf=pinBuf.slice(0,-1); updateDots(); return; }
+    if(pinBuf.length>=4) return; pinBuf+=k; updateDots();
+    if(pinBuf.length===4) setTimeout(submitPin,130);
+  }
+  function submitPin(){
+    if(lockMode==='unlock'){
+      hashPIN(pinBuf,settings.pin.salt).then(function(h){
+        if(h===settings.pin.hash){ locked=false; pinBuf=''; hideLock(); render(); }
+        else { pinBuf=''; var d=$('#pin-dots'); if(d){d.classList.add('err');} var s=$('#lock-sub'); if(s)s.textContent='Wrong PIN — try again'; setTimeout(updateDots,60); }
+      });
+    } else if(lockMode==='set'){ firstPin=pinBuf; pinBuf=''; lockMode='confirm'; drawLock(); }
+    else if(lockMode==='confirm'){
+      if(pinBuf===firstPin){ var salt=randSalt(); hashPIN(firstPin,salt).then(function(h){ settings.pin={salt:salt,hash:h}; save(K.settings,settings); pinBuf='';firstPin=''; locked=false; hideLock(); toast('🔒 Lock set — you’re protected'); render(); }); }
+      else { pinBuf='';firstPin=''; lockMode='set'; drawLock(); var s=$('#lock-sub'); if(s)s.textContent='PINs didn’t match — try again'; var d=$('#pin-dots'); if(d)d.classList.add('err'); }
+    }
+  }
+  function forgotPin(){
+    if(confirm('Forgot your PIN?\n\nThe only way back in is to reset the app, which ERASES all data on this phone. If you have an exported backup you can restore it afterwards.\n\nReset now?')){
+      [K.vault,K.recipes,K.body,K.tx,K.budgets,K.todos,K.reminders,K.habits,K.settings,K.seeded,K.seededTx].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+      location.reload();
+    }
+  }
+  function enableBiometric(){
+    if(!bioSupported()){ toast('This device doesn’t support fingerprint unlock'); return; }
+    var challenge=new Uint8Array(32); crypto.getRandomValues(challenge);
+    var userId=new Uint8Array(16); crypto.getRandomValues(userId);
+    navigator.credentials.create({publicKey:{ challenge:challenge.buffer, rp:{name:'Life Index'},
+      user:{id:userId.buffer, name:(settings.name||'me')+'@lifeindex', displayName:settings.name||'Me'},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform', userVerification:'required', residentKey:'preferred'},
+      timeout:60000, attestation:'none' }})
+    .then(function(cred){ if(!cred){toast('Couldn’t set up fingerprint');return;} settings.bio={id:b64u(cred.rawId)}; save(K.settings,settings); toast('👆 Fingerprint / Face ID enabled'); render(); })
+    .catch(function(){ toast('Fingerprint setup cancelled'); });
+  }
+  function biometricUnlock(){
+    if(!settings.bio||!bioSupported()) return;
+    var challenge=new Uint8Array(32); crypto.getRandomValues(challenge);
+    navigator.credentials.get({publicKey:{ challenge:challenge.buffer, timeout:60000, userVerification:'required',
+      allowCredentials:[{type:'public-key', id:unb64u(settings.bio.id)}] }})
+    .then(function(a){ if(a){ locked=false; pinBuf=''; hideLock(); render(); } })
+    .catch(function(){ var s=$('#lock-sub'); if(s)s.textContent='Enter your PIN, or tap the fingerprint button'; });
+  }
+
+  /* auto-lock + privacy veil on backgrounding */
+  var hideAt=0;
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ if(hasPIN()) document.body.classList.add('veiled'); hideAt=Date.now(); }
+    else { document.body.classList.remove('veiled'); if(hasPIN() && !locked && (Date.now()-hideAt>60000)) lock(); }
+  });
+
   /* ---------- PWA (harmless where unsupported) ---------- */
   if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('./sw.js').catch(function(){}); }catch(e){} }
 
-  render();
+  if(hasPIN()) lock(); else render();
 })();
 </script>
 

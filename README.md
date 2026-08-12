@@ -69,7 +69,10 @@ high-contrast and legible.
 - ✅ **Phase 2 — Recipes** built: recipe list, detail, add/edit with dynamic ingredients, auto cost & per-serving, favourites, ratings, photos, "cook this".
 - ✅ **Phase 4 — My Body** built: weight (trend), cycle (period logging + next-period prediction), mood tracking.
 - ✅ **Phase 3 — Spending** built: month-by-month overview with category donut, transaction list, manual add, **CSV bank-statement import** with auto-categorisation, per-category budgets with overspend flags. Home shows spend + predicted period.
-- ⬜ Remaining: Phase 3 Time/Habits, real cloud sync + install via GitHub Pages, optional delight layer (mascot, streaks, confetti).
+- ✅ **Phase 3 — To-Do, Reminders & Habits** built: quick checklist (star/complete/clear); reminders for birthdays (auto-recurring), events and to-do nudges with date badges; daily habits with streaks and a 7-day strip. All surface on Home.
+- ✅ **App lock** built: 4-digit **PIN** with a sparkly keypad, optional **fingerprint / Face ID** (WebAuthn), auto-lock + privacy veil when backgrounded, safe "forgot PIN → reset" path. PIN hashed (SHA-256) — data still lives only on-device.
+- ✅ **PWA install polish**: PNG app icons (incl. apple-touch), verified working under a GitHub Pages project subpath.
+- ⬜ Remaining: enable GitHub Pages (one settings toggle), optional cloud sync, optional delight layer (mascot, confetti).
 
 **Vault** also now supports insurance sub-types, an Investments category, and per-entry website + login (username/masked password).
 
