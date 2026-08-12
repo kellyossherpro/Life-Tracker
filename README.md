@@ -67,6 +67,10 @@ high-contrast and legible.
 - ✅ **Phase 0 — Foundation** built: installable PWA shell, hash-router navigation, offline service worker, local-first storage, JSON export/import backup.
 - ✅ **Phase 1 — Vault** built: add/edit/delete, category filters, search, masked sensitive fields.
 - ✅ **Phase 2 — Recipes** built: recipe list, detail, add/edit with dynamic ingredients, auto cost & per-serving, favourites, ratings, photos, "cook this".
-- ⬜ Next: **Phase 3** (Spending & Time) or **Phase 4** (My Body), plus real cloud sync + install via GitHub Pages.
+- ✅ **Phase 4 — My Body** built: weight (trend), cycle (period logging + next-period prediction), mood tracking.
+- ✅ **Phase 3 — Spending** built: month-by-month overview with category donut, transaction list, manual add, **CSV bank-statement import** with auto-categorisation, per-category budgets with overspend flags. Home shows spend + predicted period.
+- ⬜ Remaining: Phase 3 Time/Habits, real cloud sync + install via GitHub Pages, optional delight layer (mascot, streaks, confetti).
+
+**Vault** also now supports insurance sub-types, an Investments category, and per-entry website + login (username/masked password).
 
 The app lives in `index.html` (self-contained) with `manifest.webmanifest`, `sw.js`, and `icons/`.
