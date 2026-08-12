@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life Index</title>
+<meta name="description" content="A private, phone-first app that holds your whole life — beautifully in order.">
+<meta name="theme-color" content="#8E6BFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life Index">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<style>
+  :root{
+    --font-display:'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body:'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-accent:'Dancing Script', 'Snell Roundhand', 'Brush Script MT', cursive;
+
+    /* Light — pastel dream */
+    --lavender:#BFA6FF; --pink:#FFB6E6; --pink-soft:#FFD6F3;
+    --mint:#C6F1FF; --blue:#AEEBFF; --yellow:#FDE68A;
+    --bg-0:#efe7ff; --bg-1:#f6ecff; --bg-2:#ffeaf7;
+    --ink:#4a3f6b; --ink-soft:#8b80a8; --ink-faint:#a99fc4;
+    --card:rgba(255,255,255,.72); --card-2:rgba(255,255,255,.55);
+    --border:rgba(150,120,220,.18); --border-2:rgba(150,120,220,.12);
+    --shadow:0 8px 28px rgba(150,120,220,.20);
+    --shadow-sm:0 4px 14px rgba(150,120,220,.16);
+    --grad:linear-gradient(135deg,#BFA6FF 0%,#FFB6E6 100%);
+    --grad-cool:linear-gradient(135deg,#AEEBFF 0%,#BFA6FF 100%);
+    --nav-bg:rgba(255,255,255,.72);
+    --star:rgba(150,120,220,.55);
+    --good:#39b57e; --warn:#e08a3c; --danger:#e26d8a;
+    --chip:rgba(255,255,255,.7);
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --lavender:#8E6BFF; --pink:#FF6EC7; --pink-soft:#FAD6FF;
+    --mint:#B8F1D9; --blue:#7DE9FF; --yellow:#FFE3A3;
+    --bg-0:#161329; --bg-1:#1D1B2E; --bg-2:#241a3a;
+    --ink:#ede7ff; --ink-soft:#b7abdd; --ink-faint:#8b7fb8;
+    --card:rgba(255,255,255,.06); --card-2:rgba(255,255,255,.04);
+    --border:rgba(255,255,255,.12); --border-2:rgba(255,255,255,.08);
+    --shadow:0 10px 34px rgba(0,0,0,.45);
+    --shadow-sm:0 6px 18px rgba(0,0,0,.4);
+    --grad:linear-gradient(135deg,#8E6BFF 0%,#FF6EC7 100%);
+    --grad-cool:linear-gradient(135deg,#7DE9FF 0%,#8E6BFF 100%);
+    --nav-bg:rgba(29,27,46,.72);
+    --star:rgba(255,255,255,.85);
+    --good:#68e0a8; --warn:#ffc07a; --danger:#ff8fb0;
+    --chip:rgba(255,255,255,.08);
+  }}
+  :root[data-theme="dark"]{
+    --lavender:#8E6BFF; --pink:#FF6EC7; --pink-soft:#FAD6FF;
+    --mint:#B8F1D9; --blue:#7DE9FF; --yellow:#FFE3A3;
+    --bg-0:#161329; --bg-1:#1D1B2E; --bg-2:#241a3a;
+    --ink:#ede7ff; --ink-soft:#b7abdd; --ink-faint:#8b7fb8;
+    --card:rgba(255,255,255,.06); --card-2:rgba(255,255,255,.04);
+    --border:rgba(255,255,255,.12); --border-2:rgba(255,255,255,.08);
+    --shadow:0 10px 34px rgba(0,0,0,.45);
+    --shadow-sm:0 6px 18px rgba(0,0,0,.4);
+    --grad:linear-gradient(135deg,#8E6BFF 0%,#FF6EC7 100%);
+    --grad-cool:linear-gradient(135deg,#7DE9FF 0%,#8E6BFF 100%);
+    --nav-bg:rgba(29,27,46,.72);
+    --star:rgba(255,255,255,.85);
+    --good:#68e0a8; --warn:#ffc07a; --danger:#ff8fb0;
+    --chip:rgba(255,255,255,.08);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--font-body); color:var(--ink);
+    background:
+      radial-gradient(120% 80% at 100% 0%, var(--bg-2) 0%, transparent 55%),
+      radial-gradient(120% 90% at 0% 100%, var(--bg-2) 0%, transparent 50%),
+      linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-2) 100%);
+    background-attachment:fixed;
+    min-height:100vh; min-height:100dvh;
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+    overflow-x:hidden;
+  }
+  /* starfield */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.9;
+    background-image:
+      radial-gradient(1.4px 1.4px at 12% 18%, var(--star) 50%, transparent),
+      radial-gradient(1.2px 1.2px at 78% 12%, var(--star) 50%, transparent),
+      radial-gradient(1.6px 1.6px at 62% 32%, var(--star) 50%, transparent),
+      radial-gradient(1.1px 1.1px at 28% 42%, var(--star) 50%, transparent),
+      radial-gradient(1.3px 1.3px at 88% 48%, var(--star) 50%, transparent),
+      radial-gradient(1.5px 1.5px at 42% 8%, var(--star) 50%, transparent),
+      radial-gradient(1.1px 1.1px at 8% 62%, var(--star) 50%, transparent),
+      radial-gradient(1.4px 1.4px at 70% 72%, var(--star) 50%, transparent);
+    animation:twinkle 5s ease-in-out infinite;
+  }
+  @keyframes twinkle{0%,100%{opacity:.55}50%{opacity:1}}
+  @media (prefers-reduced-motion:reduce){ body::before{animation:none} }
+
+  .app{position:relative; z-index:1; max-width:500px; margin:0 auto; padding:0 18px 120px; min-height:100dvh}
+  .screen{animation:rise .38s cubic-bezier(.2,.7,.3,1)}
+  @keyframes rise{from{opacity:0; transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){ .screen{animation:none} }
+
+  /* App bar */
+  .appbar{display:flex; align-items:center; justify-content:space-between; padding:22px 2px 6px}
+  .brand{font-family:var(--font-display); font-weight:800; font-size:24px; letter-spacing:-.01em;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .brand .spk{-webkit-text-fill-color:initial; color:var(--pink)}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--grad);display:grid;place-items:center;
+    color:#fff;font-weight:700;box-shadow:var(--shadow-sm);border:2px solid var(--card);cursor:pointer;font-size:15px}
+  .iconbtn{width:40px;height:40px;border-radius:14px;background:var(--card);border:1px solid var(--border);
+    display:grid;place-items:center;font-size:17px;cursor:pointer;box-shadow:var(--shadow-sm);color:var(--ink)}
+
+  /* Greeting */
+  .greet{margin:14px 2px 20px}
+  .greet .hi{font-family:var(--font-display); font-size:28px; font-weight:700; line-height:1.15; margin:0}
+  .greet .name{font-family:var(--font-accent); font-size:38px; font-weight:700; color:var(--lavender); line-height:1}
+  .greet .sub{font-size:13.5px; color:var(--ink-soft); margin-top:4px}
+
+  h2.title{font-family:var(--font-display); font-size:22px; font-weight:700; margin:0 0 2px}
+  .screen-head{display:flex; align-items:flex-end; justify-content:space-between; margin:6px 2px 16px}
+  .screen-head .sub{font-size:13px;color:var(--ink-soft)}
+
+  .section-label{font-size:12px; font-weight:600; letter-spacing:.04em; color:var(--ink-soft);
+    text-transform:uppercase; margin:22px 4px 10px; display:flex; align-items:center; gap:6px}
+
+  /* Cards */
+  .card{background:var(--card); border:1px solid var(--border); border-radius:24px; padding:18px;
+    box-shadow:var(--shadow); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px)}
+  .card.tight{padding:14px}
+
+  /* Snapshot rows */
+  .snap{display:flex; flex-direction:column; gap:2px}
+  .snap-row{display:flex; align-items:center; gap:14px; padding:11px 4px}
+  .snap-row + .snap-row{border-top:1px solid var(--border-2)}
+  .bubble{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;font-size:20px;flex:0 0 auto;
+    box-shadow:var(--shadow-sm)}
+  .b-lav{background:linear-gradient(135deg,var(--lavender),var(--pink-soft))}
+  .b-mint{background:linear-gradient(135deg,var(--mint),var(--blue))}
+  .b-pink{background:linear-gradient(135deg,var(--pink),var(--pink-soft))}
+  .b-yellow{background:linear-gradient(135deg,var(--yellow),var(--pink-soft))}
+  .snap-row .txt{flex:1; min-width:0}
+  .snap-row .lead{font-size:14px; color:var(--ink-soft); line-height:1.25}
+  .snap-row .big{font-weight:600; font-size:15.5px; color:var(--ink)}
+  .snap-row .when{font-weight:700}
+  .pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap;
+    background:var(--chip);border:1px solid var(--border-2);color:var(--ink-soft)}
+  .pill.soon{color:var(--danger)}
+
+  /* Quick add grid */
+  .qa-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:2px}
+  .qa{display:flex; align-items:center; gap:10px; padding:14px; border-radius:18px; cursor:pointer;
+    background:var(--card-2); border:1px solid var(--border); font-weight:500; font-size:14px; color:var(--ink);
+    box-shadow:var(--shadow-sm); transition:transform .12s ease}
+  .qa:active{transform:scale(.96)}
+  .qa .e{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:17px;flex:0 0 auto}
+
+  /* stat row */
+  .stat-row{display:flex; gap:10px; margin-top:12px}
+  .stat{flex:1; background:var(--card-2); border:1px solid var(--border); border-radius:18px; padding:13px 14px}
+  .stat .k{font-size:11.5px; color:var(--ink-soft); font-weight:500}
+  .stat .v{font-family:var(--font-display); font-weight:700; font-size:20px; margin-top:3px}
+  .stat .v small{font-size:13px; color:var(--ink-soft); font-weight:600; font-family:var(--font-body)}
+
+  /* Vault list */
+  .chips{display:flex; gap:8px; overflow-x:auto; padding:2px 2px 10px; margin:0 -2px; -webkit-overflow-scrolling:touch}
+  .chips::-webkit-scrollbar{display:none}
+  .chip-f{white-space:nowrap; padding:8px 14px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer;
+    background:var(--chip); border:1px solid var(--border); color:var(--ink-soft)}
+  .chip-f.on{background:var(--grad); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm)}
+  .v-list{display:flex; flex-direction:column; gap:12px}
+  .v-card{display:flex; align-items:center; gap:14px; padding:15px; cursor:pointer; transition:transform .12s ease}
+  .v-card:active{transform:scale(.985)}
+  .v-card .meta{flex:1; min-width:0}
+  .v-card .t{font-weight:600; font-size:15.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .v-card .p{font-size:12.5px; color:var(--ink-soft); margin:2px 0 0}
+  .v-card .right{text-align:right; flex:0 0 auto}
+  .v-card .cost{font-weight:700; font-size:14.5px}
+  .v-card .due{font-size:11px; color:var(--ink-soft); margin-top:2px}
+
+  /* Buttons */
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; border:none;
+    border-radius:16px; padding:15px 18px; font-family:var(--font-body); font-weight:600; font-size:15px;
+    cursor:pointer; background:var(--grad); color:#fff; box-shadow:var(--shadow-sm); transition:transform .12s ease}
+  .btn:active{transform:scale(.98)}
+  .btn.ghost{background:var(--card); color:var(--ink); border:1px solid var(--border); box-shadow:none}
+  .btn.danger{background:transparent; color:var(--danger); border:1px solid var(--danger)}
+  .btn.sm{width:auto; padding:10px 16px; font-size:13.5px; border-radius:13px}
+
+  /* Forms */
+  .field{margin-bottom:14px}
+  .field label{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin:0 0 6px 4px}
+  .field input,.field select,.field textarea{width:100%; font-family:var(--font-body); font-size:15px; color:var(--ink);
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px 14px; outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease}
+  .field textarea{resize:vertical; min-height:76px}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--lavender);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--lavender) 28%, transparent)}
+  .field input::placeholder,.field textarea::placeholder{color:var(--ink-faint)}
+  .field select{appearance:none; -webkit-appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-soft) 50%),linear-gradient(135deg,var(--ink-soft) 50%,transparent 50%);
+    background-position:calc(100% - 20px) 20px,calc(100% - 14px) 20px; background-size:6px 6px,6px 6px; background-repeat:no-repeat}
+  .field.locked input{padding-right:48px}
+  .reveal{position:absolute; right:10px; bottom:9px; width:30px;height:30px;border:none;background:transparent;
+    cursor:pointer; font-size:16px; color:var(--ink-soft)}
+  .lockwrap{position:relative}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .locknote{font-size:11.5px; color:var(--ink-faint); margin:-8px 4px 0; display:flex; gap:5px; align-items:center}
+
+  /* search */
+  .search{position:relative; margin-bottom:12px}
+  .search input{width:100%; font-family:var(--font-body); font-size:14.5px; color:var(--ink); background:var(--card);
+    border:1px solid var(--border); border-radius:16px; padding:13px 14px 13px 42px; outline:none}
+  .search .mag{position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--ink-soft); font-size:15px}
+
+  /* empty / coming soon */
+  .empty{text-align:center; padding:46px 20px; color:var(--ink-soft)}
+  .empty .em{font-size:52px; margin-bottom:10px; filter:drop-shadow(0 6px 12px rgba(0,0,0,.15))}
+  .empty h3{font-family:var(--font-display); color:var(--ink); font-size:21px; margin:0 0 6px}
+  .empty p{font-size:14px; margin:0 auto; max-width:280px}
+  .soon-tag{display:inline-block; margin-top:14px; font-size:12px; font-weight:600; padding:6px 14px; border-radius:999px;
+    background:var(--grad); color:#fff; box-shadow:var(--shadow-sm)}
+
+  /* Bottom nav */
+  .nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; padding:0 0 max(12px,env(safe-area-inset-bottom))}
+  .nav-inner{display:flex; align-items:center; justify-content:space-around; gap:2px; width:min(500px,calc(100% - 24px));
+    background:var(--nav-bg); border:1px solid var(--border); border-radius:26px; padding:9px 10px; margin:0 12px;
+    box-shadow:var(--shadow); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px)}
+  .nav-item{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; cursor:pointer;
+    color:var(--ink-faint); font-size:10.5px; font-weight:500; background:none; border:none; font-family:var(--font-body)}
+  .nav-item .ic{font-size:20px; line-height:1; transition:transform .15s ease}
+  .nav-item.on{color:var(--lavender)}
+  .nav-item.on .ic{transform:translateY(-1px) scale(1.08)}
+  .fab{flex:0 0 auto; width:54px; height:54px; margin:-20px 4px 0; border-radius:20px; background:var(--grad);
+    color:#fff; border:none; font-size:26px; cursor:pointer; box-shadow:0 8px 22px color-mix(in srgb,var(--lavender) 55%, transparent);
+    display:grid; place-items:center; transition:transform .15s ease}
+  .fab:active{transform:scale(.92) rotate(90deg)}
+
+  /* Sheet */
+  .backdrop{position:fixed; inset:0; z-index:50; background:rgba(20,15,40,.42); backdrop-filter:blur(3px);
+    opacity:0; pointer-events:none; transition:opacity .25s ease}
+  .backdrop.open{opacity:1; pointer-events:auto}
+  .sheet{position:fixed; left:0; right:0; bottom:0; z-index:60; background:var(--bg-1);
+    border-radius:28px 28px 0 0; border-top:1px solid var(--border); padding:10px 20px max(24px,env(safe-area-inset-bottom));
+    box-shadow:0 -10px 40px rgba(0,0,0,.3); transform:translateY(110%); transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    max-width:500px; margin:0 auto}
+  .sheet.open{transform:none}
+  .grab{width:42px; height:5px; border-radius:99px; background:var(--border); margin:6px auto 14px}
+  .sheet h3{font-family:var(--font-display); font-size:20px; margin:0 0 4px}
+  .sheet .sd{font-size:13px; color:var(--ink-soft); margin:0 0 16px}
+
+  /* toast */
+  .toast{position:fixed; left:50%; bottom:104px; transform:translateX(-50%) translateY(20px); z-index:80;
+    background:var(--ink); color:var(--bg-1); font-size:13.5px; font-weight:500; padding:11px 18px; border-radius:14px;
+    box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease; max-width:88%}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  .form-actions{display:flex; flex-direction:column; gap:10px; margin-top:6px}
+  .hidden{display:none!important}
+  .center-x{display:flex; justify-content:center}
+</style>
+
+<div class="app" id="app"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nav-item" data-nav="/"><span class="ic">🏠</span>Home</button>
+    <button class="nav-item" data-nav="/vault"><span class="ic">🗝️</span>Vault</button>
+    <button class="fab" id="fab" aria-label="Quick add">＋</button>
+    <button class="nav-item" data-nav="/food"><span class="ic">🍳</span>Food</button>
+    <button class="nav-item" data-nav="/more"><span class="ic">✨</span>More</button>
+  </div>
+</nav>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var app=$('#app');
+
+  /* ---------- storage ---------- */
+  var K={vault:'lifeindex.vault', settings:'lifeindex.settings', seeded:'lifeindex.seeded'};
+  function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
+  function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  var settings=load(K.settings,{name:'Kelly', theme:'system', currency:'R'});
+  var vault=load(K.vault,[]);
+
+  var CAT={
+    medical:{label:'Medical Aid',icon:'🛡️',b:'b-mint'},
+    insurance:{label:'Insurance',icon:'📋',b:'b-lav'},
+    internet:{label:'Internet',icon:'🌐',b:'b-mint'},
+    rent:{label:'Rent & Home',icon:'🏠',b:'b-lav'},
+    car:{label:'Car',icon:'🚗',b:'b-pink'},
+    id:{label:'ID & Documents',icon:'🪪',b:'b-yellow'},
+    utilities:{label:'Utilities',icon:'💡',b:'b-yellow'},
+    subscriptions:{label:'Subscriptions',icon:'📺',b:'b-pink'},
+    banking:{label:'Banking',icon:'🏦',b:'b-lav'},
+    other:{label:'Other',icon:'📎',b:'b-mint'}
+  };
+
+  /* ---------- seed sample data on first run ---------- */
+  if(!load(K.seeded,false)){
+    var d=function(n){var t=new Date(); t.setDate(t.getDate()+n); return t.toISOString().slice(0,10)};
+    vault=[
+      {id:uid(),category:'rent',title:'Apartment Rent',provider:'Landlord',contact:'',accountNo:'',idNumber:'',monthlyCost:8500,renewalDate:d(5),notes:'Paid via EFT on the 1st'},
+      {id:uid(),category:'car',title:'Car Service',provider:'Toyota',contact:'011 555 0123',accountNo:'',idNumber:'',monthlyCost:0,renewalDate:d(12),notes:'60 000 km service'},
+      {id:uid(),category:'medical',title:'Discovery Health',provider:'Discovery',contact:'0860 99 88 77',accountNo:'1234567890',idNumber:'',monthlyCost:1850,renewalDate:d(23),notes:'Classic Comprehensive plan'},
+      {id:uid(),category:'internet',title:'Fibre',provider:'Vumatel / Afrihost',contact:'',accountNo:'AFH-882140',idNumber:'',monthlyCost:699,renewalDate:d(40),notes:'100Mbps uncapped'}
+    ];
+    save(K.vault,vault); save(K.seeded,true);
+  }
+
+  function uid(){return 'x'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3)}
+  function money(n){var v=Number(n)||0; return settings.currency+' '+v.toLocaleString('en-ZA',{minimumFractionDigits:v%1?2:0,maximumFractionDigits:2})}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function daysUntil(iso){if(!iso)return null; var t=new Date(iso+'T00:00:00'); var now=new Date(); now.setHours(0,0,0,0); return Math.round((t-now)/86400000)}
+  function whenText(n){if(n==null)return ''; if(n<0)return Math.abs(n)+'d ago'; if(n===0)return 'today'; if(n===1)return 'tomorrow'; return 'in '+n+' days'}
+
+  /* ---------- theme ---------- */
+  function applyTheme(){
+    var t=settings.theme;
+    if(t==='system'){document.documentElement.removeAttribute('data-theme');}
+    else{document.documentElement.setAttribute('data-theme',t);}
+  }
+  applyTheme();
+
+  /* ---------- toast ---------- */
+  var toastT;
+  function toast(msg){var el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){el.classList.remove('show')},2200)}
+
+  /* ---------- router ---------- */
+  function go(path){ if(location.hash!=='#'+path) location.hash='#'+path; else render(); }
+  function current(){var h=location.hash.replace(/^#/,''); return h||'/';}
+  window.addEventListener('hashchange',render);
+
+  function setNav(path){
+    var base='/'+ (path.split('/')[1]||'');
+    document.querySelectorAll('.nav-item').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-nav')===base);
+    });
+  }
+
+  function greeting(){var h=new Date().getHours(); return h<12?'Good morning,':h<18?'Good afternoon,':'Good evening,';}
+
+  /* ---------- screens ---------- */
+  function screenHome(){
+    var upcoming=vault.filter(function(e){return e.renewalDate}).map(function(e){return {e:e,n:daysUntil(e.renewalDate)}})
+      .filter(function(x){return x.n!=null && x.n>=0}).sort(function(a,b){return a.n-b.n}).slice(0,4);
+    var monthly=vault.reduce(function(s,e){return s+(Number(e.monthlyCost)||0)},0);
+
+    var snap = upcoming.length ? upcoming.map(function(x){
+      var c=CAT[x.e.category]||CAT.other;
+      return '<div class="snap-row"><div class="bubble '+c.b+'">'+c.icon+'</div>'+
+        '<div class="txt"><div class="lead">'+esc(x.e.title)+'</div>'+
+        '<div class="big">'+esc(c.label)+'</div></div>'+
+        '<span class="pill '+(x.n<=7?'soon':'')+'"><span class="when">'+whenText(x.n)+'</span></span></div>';
+    }).join('') : '<div class="empty" style="padding:26px 10px"><div class="em">🌙</div><h3>All calm</h3><p>Nothing due soon. Add things to your Vault and reminders will appear here.</p></div>';
+
+    return ''+
+    '<div class="appbar"><div class="brand">Life Index <span class="spk">✨</span></div>'+
+      '<div class="avatar" data-nav-go="/more">'+esc((settings.name||'K').trim().charAt(0).toUpperCase())+'</div></div>'+
+    '<div class="greet"><p class="hi">'+greeting()+'</p><div class="name">'+esc(settings.name||'you')+' ✨</div>'+
+      '<div class="sub">Here’s your life, beautifully in order.</div></div>'+
+
+    '<div class="section-label">🔮 Today’s Snapshot</div>'+
+    '<div class="card"><div class="snap">'+snap+'</div>'+
+      '<div class="stat-row"><div class="stat"><div class="k">Monthly commitments</div><div class="v">'+money(monthly).replace(settings.currency,settings.currency+' ')+'</div></div>'+
+      '<div class="stat"><div class="k">In your Vault</div><div class="v">'+vault.length+' <small>items</small></div></div></div>'+
+    '</div>'+
+
+    '<div class="section-label">💫 Quick Add</div>'+
+    '<div class="qa-grid">'+
+      '<div class="qa" data-nav-go="/vault/new"><span class="e b-lav">🗝️</span>Add to Vault</div>'+
+      '<div class="qa" data-soon="Foods & Recipes"><span class="e b-pink">🍳</span>Add Food</div>'+
+      '<div class="qa" data-soon="Weight tracking"><span class="e b-mint">⚖️</span>Log Weight</div>'+
+      '<div class="qa" data-soon="Reminders"><span class="e b-yellow">🔔</span>Add Reminder</div>'+
+    '</div>';
+  }
+
+  var vaultFilter='all';
+  function screenVault(){
+    var cats=Object.keys(CAT);
+    var chips='<div class="chip-f '+(vaultFilter==='all'?'on':'')+'" data-filter="all">All</div>'+
+      cats.filter(function(c){return vault.some(function(e){return e.category===c})}).map(function(c){
+        return '<div class="chip-f '+(vaultFilter===c?'on':'')+'" data-filter="'+c+'">'+CAT[c].icon+' '+esc(CAT[c].label)+'</div>';
+      }).join('');
+
+    var items=vault.filter(function(e){return vaultFilter==='all'||e.category===vaultFilter});
+    var q=(window.__vq||'').trim().toLowerCase();
+    if(q) items=items.filter(function(e){return (e.title+' '+e.provider+' '+(CAT[e.category]||{}).label).toLowerCase().indexOf(q)>-1});
+    items.sort(function(a,b){var da=daysUntil(a.renewalDate),db=daysUntil(b.renewalDate);
+      if(da==null)return 1; if(db==null)return -1; return da-db;});
+
+    var list = vault.length===0 ?
+      '<div class="empty"><div class="em">🗝️</div><h3>Your Vault is empty</h3><p>Keep every important detail — medical aid, insurance, rent, car, ID — safe in one place.</p><div class="center-x" style="margin-top:16px"><button class="btn sm" data-nav-go="/vault/new">✨ Add your first entry</button></div></div>'
+      : (items.length===0 ? '<div class="empty" style="padding:30px"><div class="em">🔍</div><p>Nothing here yet.</p></div>' :
+        '<div class="v-list">'+items.map(function(e){
+          var c=CAT[e.category]||CAT.other; var n=daysUntil(e.renewalDate);
+          return '<div class="card v-card" data-open="'+e.id+'">'+
+            '<div class="bubble '+c.b+'">'+c.icon+'</div>'+
+            '<div class="meta"><p class="t">'+esc(e.title)+'</p><p class="p">'+esc(e.provider||c.label)+'</p></div>'+
+            '<div class="right">'+(Number(e.monthlyCost)? '<div class="cost">'+money(e.monthlyCost)+'</div>':'')+
+              (n!=null&&n>=0?'<div class="due">'+(n<=7?'⏰ ':'')+whenText(n)+'</div>':'')+'</div>'+
+          '</div>';
+        }).join('')+'</div>');
+
+    return ''+
+    '<div class="screen-head"><div><h2 class="title">Your Vault 🗝️</h2><div class="sub">Everything important, one place.</div></div>'+
+      '<button class="iconbtn" data-nav-go="/vault/new">＋</button></div>'+
+    (vault.length? '<div class="search"><span class="mag">🔍</span><input id="vq" placeholder="Search your vault..." value="'+esc(window.__vq||'')+'"></div>'+
+      '<div class="chips">'+chips+'</div>':'')+
+    list;
+  }
+
+  function screenVaultForm(id){
+    var e = id? vault.find(function(x){return x.id===id}) : {category:'medical',title:'',provider:'',contact:'',accountNo:'',idNumber:'',monthlyCost:'',renewalDate:'',notes:''};
+    if(!e) return screenNotFound();
+    var opts=Object.keys(CAT).map(function(c){return '<option value="'+c+'" '+(e.category===c?'selected':'')+'>'+CAT[c].icon+'  '+CAT[c].label+'</option>'}).join('');
+    return ''+
+    '<div class="screen-head"><div><h2 class="title">'+(id?'Edit entry':'New entry')+'</h2>'+
+      '<div class="sub">'+(id?'Update your details':'Add something to your vault')+'</div></div>'+
+      '<button class="iconbtn" data-nav-go="/vault">✕</button></div>'+
+    '<form id="vform">'+
+      '<div class="field"><label>Category</label><select name="category">'+opts+'</select></div>'+
+      '<div class="field"><label>Name</label><input name="title" placeholder="e.g. Discovery Health" value="'+esc(e.title)+'" required></div>'+
+      '<div class="field"><label>Provider</label><input name="provider" placeholder="Company name" value="'+esc(e.provider)+'"></div>'+
+      '<div class="field"><label>Contact number</label><input name="contact" inputmode="tel" placeholder="Support line" value="'+esc(e.contact)+'"></div>'+
+      '<div class="field locked"><label>Policy / account number</label><div class="lockwrap">'+
+        '<input name="accountNo" type="password" placeholder="Kept private" value="'+esc(e.accountNo)+'" autocomplete="off">'+
+        '<button type="button" class="reveal" data-reveal>👁️</button></div></div>'+
+      '<div class="field locked"><label>ID number</label><div class="lockwrap">'+
+        '<input name="idNumber" type="password" placeholder="Kept private" value="'+esc(e.idNumber)+'" autocomplete="off">'+
+        '<button type="button" class="reveal" data-reveal>👁️</button></div></div>'+
+      '<div class="locknote">🔒 These two fields stay hidden until you tap the eye. Full passphrase-encryption comes with cloud sync.</div>'+
+      '<div class="row2"><div class="field"><label>Monthly cost ('+settings.currency+')</label><input name="monthlyCost" inputmode="decimal" placeholder="0" value="'+(e.monthlyCost||'')+'"></div>'+
+      '<div class="field"><label>Next date due</label><input name="renewalDate" type="date" value="'+esc(e.renewalDate)+'"></div></div>'+
+      '<div class="field"><label>Notes</label><textarea name="notes" placeholder="Anything else to remember...">'+esc(e.notes)+'</textarea></div>'+
+      '<div class="form-actions"><button class="btn" type="submit">'+(id?'💾 Save changes':'✨ Add to Vault')+'</button>'+
+        (id?'<button class="btn danger" type="button" data-del="'+id+'">Delete entry</button>':'')+'</div>'+
+    '</form>';
+  }
+
+  function screenComingSoon(emoji,title,desc,phase){
+    return '<div class="screen-head"><h2 class="title">'+title+'</h2></div>'+
+      '<div class="empty"><div class="em">'+emoji+'</div><h3>'+title+' is on the way</h3><p>'+desc+'</p>'+
+      '<div class="soon-tag">✨ Coming in '+phase+'</div></div>';
+  }
+  function screenNotFound(){return '<div class="empty"><div class="em">🌫️</div><h3>Not found</h3><p>That page floated away.</p><div class="center-x" style="margin-top:14px"><button class="btn sm" data-nav-go="/">Go home</button></div></div>'}
+
+  function screenMore(){
+    return ''+
+    '<div class="screen-head"><div><h2 class="title">More ✨</h2><div class="sub">Make it yours.</div></div></div>'+
+    '<div class="section-label">You</div>'+
+    '<div class="card tight"><div class="field" style="margin:0"><label>Your name</label><input id="s-name" value="'+esc(settings.name)+'"></div></div>'+
+    '<div class="section-label">Appearance</div>'+
+    '<div class="card tight"><div class="field" style="margin:0"><label>Theme</label><select id="s-theme">'+
+      ['system','light','dark'].map(function(t){return '<option value="'+t+'" '+(settings.theme===t?'selected':'')+'>'+(t==='system'?'Match my phone':t.charAt(0).toUpperCase()+t.slice(1))+'</option>'}).join('')+
+      '</select></div></div>'+
+    '<div class="section-label">Your data</div>'+
+    '<div class="card tight" style="display:flex;flex-direction:column;gap:10px">'+
+      '<button class="btn ghost" id="s-export">⬇️ Export a backup file</button>'+
+      '<button class="btn ghost" id="s-import">⬆️ Restore from a backup</button>'+
+      '<input type="file" id="s-file" accept="application/json" class="hidden">'+
+      '<div class="locknote" style="margin:2px 2px 0">Your data lives on this device. Export now and then, or when you switch phones. Cloud auto-sync is coming.</div>'+
+    '</div>'+
+    '<div class="section-label">Modules</div>'+
+    '<div class="card tight"><div class="snap">'+
+      '<div class="snap-row"><div class="bubble b-lav">🗝️</div><div class="txt"><div class="big">Personal Vault</div><div class="lead">Ready now · Phase 1</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row"><div class="bubble b-pink">🍳</div><div class="txt"><div class="big">Foods & Recipes</div><div class="lead">Phase 2</div></div><span class="pill">Next</span></div>'+
+      '<div class="snap-row"><div class="bubble b-mint">💸</div><div class="txt"><div class="big">Spending & Time</div><div class="lead">Phase 3</div></div><span class="pill">Soon</span></div>'+
+      '<div class="snap-row"><div class="bubble b-yellow">🩸</div><div class="txt"><div class="big">Period & Weight</div><div class="lead">Phase 4</div></div><span class="pill">Soon</span></div>'+
+    '</div></div>'+
+    '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index — made with 💜 for '+esc(settings.name)+'</div>';
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    var path=current();
+    closeSheet();
+    var html, seg=path.split('/');
+    if(path==='/') html=screenHome();
+    else if(path==='/vault') html=screenVault();
+    else if(path==='/vault/new') html=screenVaultForm(null);
+    else if(seg[1]==='vault'&&seg[2]==='edit'&&seg[3]) html=screenVaultForm(seg[3]);
+    else if(path==='/food') html=screenComingSoon('🍳','Foods & Recipes','Your living cookbook — recipes with ingredients, prep time, and cost per meal worked out for you.','Phase 2');
+    else if(path==='/money') html=screenComingSoon('💸','Spending','Upload statements, see where your money goes, and catch overspending.','Phase 3');
+    else if(path==='/more') html=screenMore();
+    else html=screenNotFound();
+
+    app.innerHTML='<div class="screen">'+html+'</div>';
+    window.scrollTo(0,0);
+    setNav(path);
+    wire(path);
+  }
+
+  /* ---------- wiring ---------- */
+  function wire(path){
+    document.querySelectorAll('[data-nav-go]').forEach(function(el){el.onclick=function(){go(el.getAttribute('data-nav-go'))}});
+    document.querySelectorAll('[data-soon]').forEach(function(el){el.onclick=function(){toast('✨ '+el.getAttribute('data-soon')+' is coming soon!')}});
+    document.querySelectorAll('[data-open]').forEach(function(el){el.onclick=function(){go('/vault/edit/'+el.getAttribute('data-open'))}});
+    document.querySelectorAll('[data-filter]').forEach(function(el){el.onclick=function(){vaultFilter=el.getAttribute('data-filter'); render()}});
+    document.querySelectorAll('[data-reveal]').forEach(function(el){el.onclick=function(){var i=el.parentNode.querySelector('input'); i.type=i.type==='password'?'text':'password'; el.textContent=i.type==='password'?'👁️':'🙈'}});
+
+    var vq=$('#vq'); if(vq){vq.oninput=function(){window.__vq=vq.value; var items=$('.v-list')||$('.empty');
+      // light re-render of list only
+      var scroll=window.scrollY; render(); window.scrollTo(0,scroll); var f=$('#vq'); if(f){f.focus(); f.setSelectionRange(f.value.length,f.value.length)} };}
+
+    var form=$('#vform'); if(form){
+      form.onsubmit=function(ev){ev.preventDefault();
+        var fd=new FormData(form); var seg=path.split('/'); var id=(seg[1]==='vault'&&seg[2]==='edit')?seg[3]:null;
+        var obj={category:fd.get('category'),title:(fd.get('title')||'').trim(),provider:(fd.get('provider')||'').trim(),
+          contact:(fd.get('contact')||'').trim(),accountNo:(fd.get('accountNo')||'').trim(),idNumber:(fd.get('idNumber')||'').trim(),
+          monthlyCost:parseFloat(fd.get('monthlyCost'))||0,renewalDate:fd.get('renewalDate')||'',notes:(fd.get('notes')||'').trim()};
+        if(!obj.title){toast('Give it a name first ✨');return}
+        if(id){var i=vault.findIndex(function(x){return x.id===id}); if(i>-1) vault[i]=Object.assign({},vault[i],obj);}
+        else{obj.id=uid(); vault.unshift(obj);}
+        save(K.vault,vault); toast(id?'Saved 💜':'Added to your Vault ✨'); go('/vault');
+      };
+      var del=$('[data-del]',form); if(del) del.onclick=function(){
+        if(confirm('Delete this entry? This can’t be undone.')){var id=del.getAttribute('data-del');
+          vault=vault.filter(function(x){return x.id!==id}); save(K.vault,vault); toast('Deleted'); go('/vault');}
+      };
+    }
+
+    // More screen
+    var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
+    var st=$('#s-theme'); if(st) st.onchange=function(){settings.theme=st.value; save(K.settings,settings); applyTheme(); toast('Theme updated ✨')};
+    var ex=$('#s-export'); if(ex) ex.onclick=exportData;
+    var im=$('#s-import'); var file=$('#s-file');
+    if(im&&file){im.onclick=function(){file.click()}; file.onchange=function(){importData(file.files[0])};}
+  }
+
+  function exportData(){
+    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault};
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='life-index-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000); toast('Backup downloaded ⬇️');
+  }
+  function importData(f){ if(!f)return; var r=new FileReader();
+    r.onload=function(){try{var data=JSON.parse(r.result);
+      if(!data||!Array.isArray(data.vault)) throw 0;
+      if(!confirm('Restore this backup? It will replace what’s here now.')) return;
+      vault=data.vault; if(data.settings) settings=Object.assign(settings,data.settings);
+      save(K.vault,vault); save(K.settings,settings); applyTheme(); toast('Restored 💜'); go('/');
+    }catch(e){toast('That file didn’t look right 😕')}};
+    r.readAsText(f);
+  }
+
+  /* ---------- quick-add sheet ---------- */
+  function openSheet(){
+    var s=$('#sheet');
+    s.innerHTML='<div class="grab"></div><h3>Quick Add ✨</h3><p class="sd">What would you like to capture?</p>'+
+      '<div class="qa-grid" style="margin-bottom:6px">'+
+        '<div class="qa" data-q="/vault/new"><span class="e b-lav">🗝️</span>Vault entry</div>'+
+        '<div class="qa" data-qsoon="Foods & Recipes"><span class="e b-pink">🍳</span>Food / recipe</div>'+
+        '<div class="qa" data-qsoon="Weight tracking"><span class="e b-mint">⚖️</span>Weight</div>'+
+        '<div class="qa" data-qsoon="Reminders"><span class="e b-yellow">🔔</span>Reminder</div>'+
+      '</div>';
+    $('#backdrop').classList.add('open'); s.classList.add('open');
+    s.querySelectorAll('[data-q]').forEach(function(el){el.onclick=function(){closeSheet(); go(el.getAttribute('data-q'))}});
+    s.querySelectorAll('[data-qsoon]').forEach(function(el){el.onclick=function(){closeSheet(); toast('✨ '+el.getAttribute('data-qsoon')+' is coming soon!')}});
+  }
+  function closeSheet(){$('#backdrop').classList.remove('open'); $('#sheet').classList.remove('open');}
+  $('#fab').onclick=openSheet;
+  $('#backdrop').onclick=closeSheet;
+  document.querySelectorAll('[data-nav]').forEach(function(b){b.onclick=function(){go(b.getAttribute('data-nav'))}});
+
+  /* ---------- PWA (harmless where unsupported) ---------- */
+  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('./sw.js').catch(function(){}); }catch(e){} }
+
+  render();
+})();
+</script>
+
+</body>
+</html>

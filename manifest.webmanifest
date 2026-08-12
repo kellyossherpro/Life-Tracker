@@ -1,0 +1,16 @@
+{
+  "name": "Life Index",
+  "short_name": "Life Index",
+  "description": "A private, phone-first app that holds your whole life — beautifully in order.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1D1B2E",
+  "theme_color": "#8E6BFF",
+  "categories": ["lifestyle", "productivity"],
+  "icons": [
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
