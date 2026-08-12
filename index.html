@@ -266,6 +266,40 @@
   .stars .st{cursor:pointer; filter:grayscale(1) opacity(.4)}
   .stars .st.on{filter:none}
 
+  /* My Body */
+  .tabs{display:flex; gap:5px; background:var(--card-2); border:1px solid var(--border); border-radius:16px; padding:5px; margin-bottom:16px}
+  .tab{flex:1; text-align:center; padding:10px 6px; border-radius:12px; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; border:none; background:transparent; font-family:var(--font-body); transition:all .15s ease}
+  .tab.on{background:var(--grad); color:#fff; box-shadow:var(--shadow-sm)}
+  .big-stat{text-align:center; padding:6px 0 10px}
+  .big-stat .bv{font-family:var(--font-display); font-weight:800; font-size:44px; line-height:1}
+  .big-stat .bv small{font-size:20px; font-weight:600; color:var(--ink-soft)}
+  .big-stat .bk{font-size:13px; color:var(--ink-soft); margin-top:6px}
+  .delta{display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:700; padding:4px 10px; border-radius:999px; margin-top:8px}
+  .delta.down{color:var(--good); background:color-mix(in srgb,var(--good) 14%,transparent)}
+  .delta.up{color:var(--danger); background:color-mix(in srgb,var(--danger) 14%,transparent)}
+  .delta.flat{color:var(--ink-soft); background:var(--chip)}
+  .spark{width:100%; height:70px; display:block; margin-top:6px}
+  .mini-form{display:flex; gap:8px; align-items:flex-end}
+  .mini-form .field{margin:0; flex:1}
+  .mini-form .btn{width:auto; flex:0 0 auto; padding:13px 16px}
+  .log-row{display:flex; align-items:center; gap:12px; padding:11px 2px}
+  .log-row + .log-row{border-top:1px solid var(--border-2)}
+  .log-row .ld{font-size:12.5px; color:var(--ink-soft); width:74px; flex:0 0 auto}
+  .log-row .lv{font-weight:700; font-size:15px}
+  .log-row .ln{flex:1; font-size:13px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .log-row .del{margin-left:auto; border:none; background:transparent; color:var(--ink-faint); font-size:15px; cursor:pointer; flex:0 0 auto}
+  .mood-picker{display:flex; justify-content:space-between; gap:6px; margin:4px 0 2px}
+  .mood-btn{flex:1; aspect-ratio:1; border:1px solid var(--border); background:var(--card-2); border-radius:16px; font-size:26px;
+    cursor:pointer; display:grid; place-items:center; transition:transform .12s ease, border-color .12s ease}
+  .mood-btn:active{transform:scale(.9)}
+  .mood-btn.on{border-color:var(--lavender); background:var(--pink-soft); box-shadow:var(--shadow-sm)}
+  .cycle-hero{text-align:center; padding:4px 0 6px}
+  .cycle-hero .ch-day{font-family:var(--font-display); font-weight:800; font-size:38px}
+  .cycle-hero .ch-k{font-size:13px; color:var(--ink-soft)}
+  .pred{display:flex; gap:10px; margin-top:12px}
+  .pred .stat{text-align:center}
+
   /* Bottom nav */
   .nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; padding:0 0 max(12px,env(safe-area-inset-bottom))}
   .nav-inner{display:flex; align-items:center; justify-content:space-around; gap:2px; width:min(500px,calc(100% - 24px));
@@ -328,12 +362,14 @@
   var app=$('#app');
 
   /* ---------- storage ---------- */
-  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', settings:'lifeindex.settings', seeded:'lifeindex.seeded'};
+  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', settings:'lifeindex.settings', seeded:'lifeindex.seeded'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
   var settings=load(K.settings,{name:'Kelly', currency:'R'});
   var vault=load(K.vault,[]);
   var recipes=load(K.recipes,[]);
+  var body=load(K.body,{weights:[],periods:[],moods:[]});
+  if(!body.weights)body.weights=[]; if(!body.periods)body.periods=[]; if(!body.moods)body.moods=[];
 
   var CAT={
     medical:{label:'Medical Aid',icon:'🛡️',b:'b-mint'},
@@ -345,17 +381,22 @@
     utilities:{label:'Utilities',icon:'💡',b:'b-yellow'},
     subscriptions:{label:'Subscriptions',icon:'📺',b:'b-pink'},
     banking:{label:'Banking',icon:'🏦',b:'b-lav'},
+    investments:{label:'Investments',icon:'📈',b:'b-mint'},
     other:{label:'Other',icon:'📎',b:'b-mint'}
   };
+  var INS_TYPES=['Car','Pet','Home','Life','Funeral','Travel','Gadget / Device','Medical gap','Other'];
+  var MOODS=[{e:'😢',l:'Awful'},{e:'😕',l:'Low'},{e:'😐',l:'Meh'},{e:'🙂',l:'Good'},{e:'😄',l:'Great'}];
 
   /* ---------- seed sample data on first run ---------- */
   if(!load(K.seeded,false)){
     var d=function(n){var t=new Date(); t.setDate(t.getDate()+n); return t.toISOString().slice(0,10)};
     vault=[
-      {id:uid(),category:'rent',title:'Apartment Rent',provider:'Landlord',contact:'',accountNo:'',idNumber:'',monthlyCost:8500,renewalDate:d(5),notes:'Paid via EFT on the 1st'},
-      {id:uid(),category:'car',title:'Car Service',provider:'Toyota',contact:'011 555 0123',accountNo:'',idNumber:'',monthlyCost:0,renewalDate:d(12),notes:'60 000 km service'},
-      {id:uid(),category:'medical',title:'Discovery Health',provider:'Discovery',contact:'0860 99 88 77',accountNo:'1234567890',idNumber:'',monthlyCost:1850,renewalDate:d(23),notes:'Classic Comprehensive plan'},
-      {id:uid(),category:'internet',title:'Fibre',provider:'Vumatel / Afrihost',contact:'',accountNo:'AFH-882140',idNumber:'',monthlyCost:699,renewalDate:d(40),notes:'100Mbps uncapped'}
+      {id:uid(),category:'rent',subtype:'',title:'Apartment Rent',provider:'Landlord',contact:'',accountNo:'',idNumber:'',monthlyCost:8500,renewalDate:d(5),website:'',username:'',password:'',notes:'Paid via EFT on the 1st'},
+      {id:uid(),category:'insurance',subtype:'Pet',title:'Pet Insurance',provider:'Oneplan',contact:'',accountNo:'',idNumber:'',monthlyCost:320,renewalDate:d(18),website:'https://www.oneplan.co.za',username:'',password:'',notes:'Covers vet visits & meds'},
+      {id:uid(),category:'car',subtype:'',title:'Car Service',provider:'Toyota',contact:'011 555 0123',accountNo:'',idNumber:'',monthlyCost:0,renewalDate:d(12),website:'',username:'',password:'',notes:'60 000 km service'},
+      {id:uid(),category:'medical',subtype:'',title:'Essential Med',provider:'Fedhealth',contact:'0860 99 88 77',accountNo:'1234567890',idNumber:'',monthlyCost:1850,renewalDate:d(23),website:'https://www.fedhealth.co.za',username:'',password:'',notes:'Essential plan'},
+      {id:uid(),category:'investments',subtype:'',title:'Allan Gray',provider:'Allan Gray',contact:'',accountNo:'',idNumber:'',monthlyCost:0,renewalDate:'',website:'https://www.allangray.co.za',username:'',password:'',notes:'Retirement annuity'},
+      {id:uid(),category:'internet',subtype:'',title:'Fibre',provider:'Vumatel / Afrihost',contact:'',accountNo:'AFH-882140',idNumber:'',monthlyCost:699,renewalDate:d(40),website:'https://www.afrihost.com',username:'',password:'',notes:'100Mbps uncapped'}
     ];
     recipes=[
       {id:uid(),name:'Creamy Chicken Pasta',photo:'',favourite:true,servings:4,prepTime:10,cookTime:20,
@@ -404,16 +445,18 @@
 
   /* ---------- screens ---------- */
   function screenHome(){
-    var upcoming=vault.filter(function(e){return e.renewalDate}).map(function(e){return {e:e,n:daysUntil(e.renewalDate)}})
-      .filter(function(x){return x.n!=null && x.n>=0}).sort(function(a,b){return a.n-b.n}).slice(0,4);
+    var items=[];
+    vault.forEach(function(e){ if(e.renewalDate){ var n=daysUntil(e.renewalDate); if(n!=null&&n>=0){ var c=CAT[e.category]||CAT.other;
+      items.push({icon:c.icon,b:c.b,title:e.title,label:(e.category==='insurance'&&e.subtype)?e.subtype+' insurance':c.label,days:n}); } } });
+    var np=nextPeriodInfo(); if(np&&np.days!=null&&np.days>=0&&np.days<=45) items.push({icon:'🌸',b:'b-pink',title:'Period',label:'Likely to start',days:np.days});
+    items.sort(function(a,b){return a.days-b.days}); items=items.slice(0,4);
     var monthly=vault.reduce(function(s,e){return s+(Number(e.monthlyCost)||0)},0);
 
-    var snap = upcoming.length ? upcoming.map(function(x){
-      var c=CAT[x.e.category]||CAT.other;
-      return '<div class="snap-row"><div class="bubble '+c.b+'">'+c.icon+'</div>'+
-        '<div class="txt"><div class="lead">'+esc(x.e.title)+'</div>'+
-        '<div class="big">'+esc(c.label)+'</div></div>'+
-        '<span class="pill '+(x.n<=7?'soon':'')+'"><span class="when">'+whenText(x.n)+'</span></span></div>';
+    var snap = items.length ? items.map(function(x){
+      return '<div class="snap-row"><div class="bubble '+x.b+'">'+x.icon+'</div>'+
+        '<div class="txt"><div class="lead">'+esc(x.title)+'</div>'+
+        '<div class="big">'+esc(x.label)+'</div></div>'+
+        '<span class="pill '+(x.days<=7?'soon':'')+'"><span class="when">'+whenText(x.days)+'</span></span></div>';
     }).join('') : '<div class="empty" style="padding:26px 10px"><div class="em">🌙</div><h3>All calm</h3><p>Nothing due soon. Add things to your Vault and reminders will appear here.</p></div>';
 
     return ''+
@@ -447,7 +490,7 @@
 
     var items=vault.filter(function(e){return vaultFilter==='all'||e.category===vaultFilter});
     var q=(window.__vq||'').trim().toLowerCase();
-    if(q) items=items.filter(function(e){return (e.title+' '+e.provider+' '+(CAT[e.category]||{}).label).toLowerCase().indexOf(q)>-1});
+    if(q) items=items.filter(function(e){return (e.title+' '+e.provider+' '+(e.subtype||'')+' '+(e.username||'')+' '+(CAT[e.category]||{}).label).toLowerCase().indexOf(q)>-1});
     items.sort(function(a,b){var da=daysUntil(a.renewalDate),db=daysUntil(b.renewalDate);
       if(da==null)return 1; if(db==null)return -1; return da-db;});
 
@@ -456,9 +499,10 @@
       : (items.length===0 ? '<div class="empty" style="padding:30px"><div class="em">🔍</div><p>Nothing here yet.</p></div>' :
         '<div class="v-list">'+items.map(function(e){
           var c=CAT[e.category]||CAT.other; var n=daysUntil(e.renewalDate);
+          var subline = (e.category==='insurance'&&e.subtype)? e.subtype+' insurance'+(e.provider?' · '+e.provider:'') : (e.provider||c.label);
           return '<div class="card v-card" data-open="'+e.id+'">'+
             '<div class="bubble '+c.b+'">'+c.icon+'</div>'+
-            '<div class="meta"><p class="t">'+esc(e.title)+'</p><p class="p">'+esc(e.provider||c.label)+'</p></div>'+
+            '<div class="meta"><p class="t">'+esc(e.title)+(e.website?' <span style="font-size:12px">🔗</span>':'')+'</p><p class="p">'+esc(subline)+'</p></div>'+
             '<div class="right">'+(Number(e.monthlyCost)? '<div class="cost">'+money(e.monthlyCost)+'</div>':'')+
               (n!=null&&n>=0?'<div class="due">'+(n<=7?'⏰ ':'')+whenText(n)+'</div>':'')+'</div>'+
           '</div>';
@@ -473,16 +517,18 @@
   }
 
   function screenVaultForm(id){
-    var e = id? vault.find(function(x){return x.id===id}) : {category:'medical',title:'',provider:'',contact:'',accountNo:'',idNumber:'',monthlyCost:'',renewalDate:'',notes:''};
+    var e = id? vault.find(function(x){return x.id===id}) : {category:'medical',subtype:'',title:'',provider:'',contact:'',accountNo:'',idNumber:'',monthlyCost:'',renewalDate:'',website:'',username:'',password:'',notes:''};
     if(!e) return screenNotFound();
     var opts=Object.keys(CAT).map(function(c){return '<option value="'+c+'" '+(e.category===c?'selected':'')+'>'+CAT[c].icon+'  '+CAT[c].label+'</option>'}).join('');
+    var insOpts='<option value="">Choose type…</option>'+INS_TYPES.map(function(t){return '<option value="'+esc(t)+'" '+(e.subtype===t?'selected':'')+'>'+esc(t)+'</option>'}).join('');
     return ''+
     '<div class="screen-head"><div><h2 class="title">'+(id?'Edit entry':'New entry')+'</h2>'+
       '<div class="sub">'+(id?'Update your details':'Add something to your vault')+'</div></div>'+
       '<button class="iconbtn" data-nav-go="/vault">✕</button></div>'+
     '<form id="vform">'+
       '<div class="field"><label>Category</label><select name="category">'+opts+'</select></div>'+
-      '<div class="field"><label>Name</label><input name="title" placeholder="e.g. Discovery Health" value="'+esc(e.title)+'" required></div>'+
+      '<div class="field" id="subtype-wrap" style="'+(e.category==='insurance'?'':'display:none')+'"><label>Type of insurance</label><select name="subtype">'+insOpts+'</select></div>'+
+      '<div class="field"><label>Name</label><input name="title" placeholder="e.g. Essential Med" value="'+esc(e.title)+'" required></div>'+
       '<div class="field"><label>Provider</label><input name="provider" placeholder="Company name" value="'+esc(e.provider)+'"></div>'+
       '<div class="field"><label>Contact number</label><input name="contact" inputmode="tel" placeholder="Support line" value="'+esc(e.contact)+'"></div>'+
       '<div class="field locked"><label>Policy / account number</label><div class="lockwrap">'+
@@ -491,7 +537,16 @@
       '<div class="field locked"><label>ID number</label><div class="lockwrap">'+
         '<input name="idNumber" type="password" placeholder="Kept private" value="'+esc(e.idNumber)+'" autocomplete="off">'+
         '<button type="button" class="reveal" data-reveal>👁️</button></div></div>'+
-      '<div class="locknote">🔒 These two fields stay hidden until you tap the eye. Full passphrase-encryption comes with cloud sync.</div>'+
+      '<div class="locknote">🔒 Locked fields stay hidden until you tap the eye. Full passphrase-encryption comes with cloud sync.</div>'+
+      '<div class="section-label" style="margin-left:2px">🔗 Login &amp; website</div>'+
+      '<div class="field"><label>Website</label><div class="lockwrap">'+
+        '<input name="website" inputmode="url" placeholder="www.example.co.za" value="'+esc(e.website)+'" style="padding-right:46px" autocapitalize="off" autocorrect="off">'+
+        '<button type="button" class="reveal" id="open-site" title="Open site" style="font-size:15px">↗</button></div></div>'+
+      '<div class="field"><label>Login username / email</label><input name="username" placeholder="e.g. your email" value="'+esc(e.username)+'" autocapitalize="off" autocorrect="off" autocomplete="off"></div>'+
+      '<div class="field locked"><label>Login password</label><div class="lockwrap">'+
+        '<input name="password" type="password" placeholder="Kept private" value="'+esc(e.password)+'" autocomplete="new-password">'+
+        '<button type="button" class="reveal" data-reveal>👁️</button></div></div>'+
+      '<div class="section-label" style="margin-left:2px">💰 Cost &amp; dates</div>'+
       '<div class="row2"><div class="field"><label>Monthly cost ('+settings.currency+')</label><input name="monthlyCost" inputmode="decimal" placeholder="0" value="'+(e.monthlyCost||'')+'"></div>'+
       '<div class="field"><label>Next date due</label><input name="renewalDate" type="date" value="'+esc(e.renewalDate)+'"></div></div>'+
       '<div class="field"><label>Notes</label><textarea name="notes" placeholder="Anything else to remember...">'+esc(e.notes)+'</textarea></div>'+
@@ -524,7 +579,7 @@
       '<div class="snap-row" data-nav-go="/vault" style="cursor:pointer"><div class="bubble b-lav">🗝️</div><div class="txt"><div class="big">Personal Vault</div><div class="lead">Ready now · Phase 1</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/recipes" style="cursor:pointer"><div class="bubble b-pink">🍳</div><div class="txt"><div class="big">Recipes</div><div class="lead">Ready now · Phase 2</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row"><div class="bubble b-mint">💸</div><div class="txt"><div class="big">Spending & Time</div><div class="lead">Phase 3</div></div><span class="pill">Soon</span></div>'+
-      '<div class="snap-row" data-nav-go="/body" style="cursor:pointer"><div class="bubble b-yellow">🌸</div><div class="txt"><div class="big">My Body</div><div class="lead">Weight · periods · moods · Phase 4</div></div><span class="pill">Soon</span></div>'+
+      '<div class="snap-row" data-nav-go="/body" style="cursor:pointer"><div class="bubble b-yellow">🌸</div><div class="txt"><div class="big">My Body</div><div class="lead">Weight · periods · moods · Phase 4</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
     '</div></div>'+
     '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index — made with 💜 for '+esc(settings.name)+'</div>';
   }
@@ -648,6 +703,84 @@
     '</form>';
   }
 
+  /* ---------- My Body screens ---------- */
+  function today(){return new Date().toISOString().slice(0,10);}
+  function fmtDate(iso){ if(!iso)return ''; return new Date(iso+'T00:00:00').toLocaleDateString('en-ZA',{day:'numeric',month:'short'}); }
+  function daysBetween(a,b){ if(!a||!b)return 0; return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000); }
+  function addDays(iso,n){ var d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+  function nextPeriodInfo(){
+    var ps=body.periods.slice().sort(function(a,b){return (a.start||'').localeCompare(b.start||'')});
+    if(!ps.length) return null;
+    var gaps=[]; for(var i=1;i<ps.length;i++){var g=daysBetween(ps[i-1].start,ps[i].start); if(g>10&&g<60)gaps.push(g);}
+    var avg=gaps.length? Math.round(gaps.reduce(function(s,x){return s+x},0)/gaps.length):28;
+    var last=ps[ps.length-1]; var nextStart=addDays(last.start,avg);
+    return {date:nextStart,days:daysUntil(nextStart),avg:avg,cycleDay:daysBetween(last.start,today())+1,last:last.start};
+  }
+  function sparkline(vals){
+    if(vals.length<2) return '';
+    var w=300,h=60,pad=8, min=Math.min.apply(null,vals), max=Math.max.apply(null,vals), rng=(max-min)||1;
+    var pts=vals.map(function(v,i){var x=pad+(w-2*pad)*i/(vals.length-1); var y=pad+(h-2*pad)*(1-(v-min)/rng); return x.toFixed(1)+','+y.toFixed(1);});
+    var last=pts[pts.length-1].split(',');
+    return '<svg class="spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+
+      '<defs><linearGradient id="spg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#AEEBFF"/><stop offset="1" stop-color="#BFA6FF"/></linearGradient></defs>'+
+      '<polyline fill="none" stroke="url(#spg)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" points="'+pts.join(' ')+'"/>'+
+      '<circle cx="'+last[0]+'" cy="'+last[1]+'" r="4.5" fill="#BFA6FF"/></svg>';
+  }
+
+  var bodyTab='weight';
+  function screenBody(){
+    var tabs='<div class="tabs">'+[['weight','⚖️ Weight'],['cycle','🌸 Cycle'],['mood','💭 Mood']]
+      .map(function(t){return '<button class="tab '+(bodyTab===t[0]?'on':'')+'" data-btab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
+    var content = bodyTab==='cycle'? bodyCycle() : bodyTab==='mood'? bodyMood() : bodyWeight();
+    return '<div class="screen-head"><div><h2 class="title">My Body 🌸</h2><div class="sub">Weight, cycle &amp; mood — just for you.</div></div></div>'+tabs+content;
+  }
+
+  function bodyWeight(){
+    var ws=body.weights.slice().sort(function(a,b){return (a.date||'').localeCompare(b.date||'')});
+    var latest=ws[ws.length-1], prev=ws[ws.length-2];
+    var hero = latest? '<div class="big-stat"><div class="bv">'+(+latest.kg)+' <small>kg</small></div><div class="bk">Latest · '+fmtDate(latest.date)+'</div>'+
+        (prev?(function(){var dd=(+latest.kg)-(+prev.kg); var cls=dd<0?'down':dd>0?'up':'flat'; var ar=dd<0?'↓':dd>0?'↑':'→'; return '<div class="delta '+cls+'">'+ar+' '+Math.abs(dd).toFixed(1)+' kg since last</div>';})():'')+'</div>'
+      : '<div class="empty" style="padding:22px"><div class="em">⚖️</div><p>No weigh-ins yet. Add your first below 💜</p></div>';
+    var chart = ws.length>=2? '<div class="card">'+sparkline(ws.slice(-14).map(function(x){return +x.kg}))+
+        '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-faint);margin-top:2px"><span>'+fmtDate(ws[Math.max(0,ws.length-14)].date)+'</span><span>now</span></div></div>' : '';
+    var addForm='<div class="section-label">➕ Log a weigh-in</div><div class="card"><form id="wform"><div class="mini-form">'+
+      '<div class="field"><label>Weight (kg)</label><input name="kg" inputmode="decimal" placeholder="68.4" required></div>'+
+      '<div class="field"><label>Date</label><input name="date" type="date" value="'+today()+'"></div>'+
+      '<button class="btn" type="submit">Add</button></div>'+
+      '<div class="field" style="margin:10px 0 0"><input name="note" placeholder="Note (optional)"></div></form></div>';
+    var rows=body.weights.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')}).slice(0,20).map(function(x){
+      return '<div class="log-row"><span class="ld">'+fmtDate(x.date)+'</span><span class="lv">'+(+x.kg)+' kg</span><span class="ln">'+esc(x.note||'')+'</span><button class="del" data-delw="'+x.id+'">🗑</button></div>';}).join('');
+    return hero+chart+addForm+(body.weights.length?'<div class="section-label">History</div><div class="card">'+rows+'</div>':'');
+  }
+
+  function bodyCycle(){
+    var ps=body.periods.slice().sort(function(a,b){return (a.start||'').localeCompare(b.start||'')});
+    var np=nextPeriodInfo();
+    var hero = np? '<div class="cycle-hero"><div class="ch-day">Day '+np.cycleDay+'</div><div class="ch-k">of your cycle · last period '+fmtDate(np.last)+'</div></div>'
+      : '<div class="empty" style="padding:22px"><div class="em">🌸</div><p>Log when your period starts and I’ll predict the next one 💜</p></div>';
+    var pred = np? '<div class="card"><div class="pred"><div class="stat"><div class="k">Next period</div><div class="v" style="font-size:16px">'+fmtDate(np.date)+'</div></div>'+
+      '<div class="stat"><div class="k">In</div><div class="v">'+(np.days>=0?np.days+' <small>days</small>':'now')+'</div></div>'+
+      '<div class="stat"><div class="k">Avg cycle</div><div class="v">'+np.avg+' <small>d</small></div></div></div></div>' : '';
+    var addForm='<div class="section-label">➕ Log a period</div><div class="card"><form id="pform"><div class="mini-form">'+
+      '<div class="field"><label>Started</label><input name="start" type="date" value="'+today()+'" required></div>'+
+      '<div class="field"><label>Ended</label><input name="end" type="date"></div>'+
+      '<button class="btn" type="submit">Add</button></div></form>'+
+      '<button class="btn ghost" id="period-today" style="margin-top:10px">🌸 It started today</button></div>';
+    var rows=ps.slice().reverse().slice(0,16).map(function(x){var dur=x.end?(daysBetween(x.start,x.end)+1)+' days':'ongoing';
+      return '<div class="log-row"><span class="ld">'+fmtDate(x.start)+'</span><span class="lv">'+dur+'</span><span class="ln"></span><button class="del" data-delp="'+x.id+'">🗑</button></div>';}).join('');
+    return hero+pred+addForm+(ps.length?'<div class="section-label">History</div><div class="card">'+rows+'</div>':'');
+  }
+
+  function bodyMood(){
+    var picker='<div class="section-label">💭 How are you feeling today?</div><div class="card"><div class="mood-picker" id="mood-picker">'+
+      MOODS.map(function(m,i){return '<button type="button" class="mood-btn" data-mood="'+i+'" title="'+m.l+'">'+m.e+'</button>';}).join('')+'</div>'+
+      '<div class="field" style="margin:12px 0 0"><input id="mood-note" placeholder="What’s on your mind? (optional)"></div></div>';
+    var rows=body.moods.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')||((b.ts||0)-(a.ts||0))}).slice(0,24).map(function(m){
+      var md=MOODS[m.mood]||{e:'🙂',l:''};
+      return '<div class="log-row"><span class="ld">'+fmtDate(m.date)+'</span><span class="lv" style="font-size:20px">'+md.e+'</span><span class="ln">'+esc(m.note||md.l)+'</span><button class="del" data-delm="'+m.id+'">🗑</button></div>';}).join('');
+    return picker+(body.moods.length?'<div class="section-label">Recent</div><div class="card">'+rows+'</div>':'');
+  }
+
   /* ---------- render ---------- */
   function render(){
     var path=current();
@@ -661,7 +794,7 @@
     else if(path==='/recipes/new') html=screenRecipeForm(null);
     else if(seg[1]==='recipes'&&seg[2]==='edit'&&seg[3]) html=screenRecipeForm(seg[3]);
     else if(seg[1]==='recipes'&&seg[2]==='view'&&seg[3]) html=screenRecipeView(seg[3]);
-    else if(path==='/body') html=screenComingSoon('🌸','My Body','Log your weight, periods, moods and anything about how you feel — all in one gentle, private place.','Phase 4');
+    else if(path==='/body') html=screenBody();
     else if(path==='/money') html=screenComingSoon('💸','Spending','Upload statements, see where your money goes, and catch overspending.','Phase 3');
     else if(path==='/more') html=screenMore();
     else html=screenNotFound();
@@ -685,10 +818,20 @@
       var scroll=window.scrollY; render(); window.scrollTo(0,scroll); var f=$('#vq'); if(f){f.focus(); f.setSelectionRange(f.value.length,f.value.length)} };}
 
     var form=$('#vform'); if(form){
+      var catSel=form.querySelector('[name=category]'), subWrap=$('#subtype-wrap');
+      if(catSel&&subWrap) catSel.onchange=function(){ subWrap.style.display = catSel.value==='insurance'?'':'none'; };
+      var openSite=$('#open-site'); if(openSite) openSite.onclick=function(){
+        var u=(form.querySelector('[name=website]').value||'').trim();
+        if(!u){toast('Add a website first ✨');return;}
+        if(!/^https?:\/\//i.test(u)) u='https://'+u;
+        window.open(u,'_blank','noopener');
+      };
       form.onsubmit=function(ev){ev.preventDefault();
         var fd=new FormData(form); var seg=path.split('/'); var id=(seg[1]==='vault'&&seg[2]==='edit')?seg[3]:null;
-        var obj={category:fd.get('category'),title:(fd.get('title')||'').trim(),provider:(fd.get('provider')||'').trim(),
+        var obj={category:fd.get('category'),subtype:(fd.get('category')==='insurance'?(fd.get('subtype')||''):''),
+          title:(fd.get('title')||'').trim(),provider:(fd.get('provider')||'').trim(),
           contact:(fd.get('contact')||'').trim(),accountNo:(fd.get('accountNo')||'').trim(),idNumber:(fd.get('idNumber')||'').trim(),
+          website:(fd.get('website')||'').trim(),username:(fd.get('username')||'').trim(),password:(fd.get('password')||''),
           monthlyCost:parseFloat(fd.get('monthlyCost'))||0,renewalDate:fd.get('renewalDate')||'',notes:(fd.get('notes')||'').trim()};
         if(!obj.title){toast('Give it a name first ✨');return}
         if(id){var i=vault.findIndex(function(x){return x.id===id}); if(i>-1) vault[i]=Object.assign({},vault[i],obj);}
@@ -749,6 +892,19 @@
       };
     }
 
+    // My Body
+    document.querySelectorAll('[data-btab]').forEach(function(el){el.onclick=function(){bodyTab=el.getAttribute('data-btab'); render();}});
+    var wform=$('#wform'); if(wform) wform.onsubmit=function(ev){ev.preventDefault(); var fd=new FormData(wform); var kg=parseFloat(fd.get('kg'));
+      if(!kg){toast('Enter a weight ✨');return;} body.weights.push({id:uid(),date:fd.get('date')||today(),kg:kg,note:(fd.get('note')||'').trim()}); save(K.body,body); toast('Weight logged 💜'); render();};
+    var pform=$('#pform'); if(pform) pform.onsubmit=function(ev){ev.preventDefault(); var fd=new FormData(pform); var st=fd.get('start');
+      if(!st){toast('Pick a start date');return;} body.periods.push({id:uid(),start:st,end:fd.get('end')||''}); save(K.body,body); toast('Logged 🌸'); render();};
+    var pt=$('#period-today'); if(pt) pt.onclick=function(){ body.periods.push({id:uid(),start:today(),end:''}); save(K.body,body); toast('Logged 🌸'); render();};
+    document.querySelectorAll('[data-mood]').forEach(function(el){el.onclick=function(){var i=parseInt(el.getAttribute('data-mood'),10);
+      var noteEl=$('#mood-note'); var note=noteEl?noteEl.value.trim():''; body.moods.push({id:uid(),date:today(),mood:i,note:note,ts:Date.now()}); save(K.body,body); toast('Mood logged '+MOODS[i].e); render();};});
+    document.querySelectorAll('[data-delw]').forEach(function(el){el.onclick=function(){body.weights=body.weights.filter(function(x){return x.id!==el.getAttribute('data-delw')}); save(K.body,body); render();}});
+    document.querySelectorAll('[data-delp]').forEach(function(el){el.onclick=function(){body.periods=body.periods.filter(function(x){return x.id!==el.getAttribute('data-delp')}); save(K.body,body); render();}});
+    document.querySelectorAll('[data-delm]').forEach(function(el){el.onclick=function(){body.moods=body.moods.filter(function(x){return x.id!==el.getAttribute('data-delm')}); save(K.body,body); render();}});
+
     // More screen
     var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
     var ex=$('#s-export'); if(ex) ex.onclick=exportData;
@@ -757,7 +913,7 @@
   }
 
   function exportData(){
-    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes};
+    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes,body:body};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='life-index-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
@@ -767,8 +923,10 @@
     r.onload=function(){try{var data=JSON.parse(r.result);
       if(!data||!Array.isArray(data.vault)) throw 0;
       if(!confirm('Restore this backup? It will replace what’s here now.')) return;
-      vault=data.vault; if(Array.isArray(data.recipes)) recipes=data.recipes; if(data.settings) settings=Object.assign(settings,data.settings);
-      save(K.vault,vault); save(K.recipes,recipes); save(K.settings,settings); toast('Restored 💜'); go('/');
+      vault=data.vault; if(Array.isArray(data.recipes)) recipes=data.recipes;
+      if(data.body){ body=data.body; if(!body.weights)body.weights=[]; if(!body.periods)body.periods=[]; if(!body.moods)body.moods=[]; }
+      if(data.settings) settings=Object.assign(settings,data.settings);
+      save(K.vault,vault); save(K.recipes,recipes); save(K.body,body); save(K.settings,settings); toast('Restored 💜'); go('/');
     }catch(e){toast('That file didn’t look right 😕')}};
     r.readAsText(f);
   }
