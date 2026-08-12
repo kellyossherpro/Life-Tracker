@@ -180,6 +180,7 @@
   .p1 { background: var(--pine-soft); color: var(--pine); }
   .p2 { background: var(--honey-soft); color: var(--honey); }
   .p3 { background: var(--surface-2); color: var(--ink-soft); }
+  .p4 { background: color-mix(in srgb, var(--berry) 14%, var(--surface)); color: var(--berry); }
 
   /* Data model blocks */
   .schema { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
@@ -194,12 +195,12 @@
   .phase:last-child { padding-bottom: 0; }
   .phase-num {
     width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
-    font-weight: 800; font-size: 18px; color: var(--surface); background: var(--pine);
+    font-weight: 800; font-size: 18px; color: #fff; background: var(--pine);
     font-family: Georgia, serif;
   }
-  .phase:nth-child(2) .phase-num { background: var(--honey); }
-  .phase:nth-child(3) .phase-num { background: var(--berry); }
-  .phase:nth-child(4) .phase-num { background: var(--ink-soft); }
+  .phase-num.c-honey { background: var(--honey); }
+  .phase-num.c-ink   { background: var(--ink-soft); }
+  .phase-num.c-berry { background: var(--berry); }
   .phase h3 { margin: 6px 0 6px; font-size: 19px; font-weight: 800; }
   .phase .when { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); }
 
@@ -237,7 +238,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <span class="kicker"><span class="dot"></span>Blueprint · v1</span>
+    <span class="kicker"><span class="dot"></span>Blueprint · v2</span>
     <h1 class="display">The Life Index <span class="thin">— everything, in one place</span></h1>
     <p class="lead">A private, phone-first app that holds your whole life: your foods and recipes, your rent and car and medical aid, your money, your body — one tap from your home screen, and free to run.</p>
     <div class="metarow">
@@ -353,13 +354,13 @@
           <tr><th>Module</th><th>What it holds</th><th>Phase</th></tr>
         </thead>
         <tbody>
-          <tr><td><span class="m-name">Foods &amp; Recipes</span></td><td>Favorite foods, recipes, ingredients, prep &amp; cook time, cost per meal, favorite shops</td><td><span class="phase-tag p1">Phase 1</span></td></tr>
           <tr><td><span class="m-name">Personal Info Vault</span></td><td>Medical aid, insurance, internet, rent, car, ID &amp; documents — all your reference details</td><td><span class="phase-tag p1">Phase 1</span></td></tr>
-          <tr><td><span class="m-name">Period &amp; Cycle</span></td><td>Log periods &amp; symptoms, see your cycle, predict the next one</td><td><span class="phase-tag p2">Phase 2</span></td></tr>
-          <tr><td><span class="m-name">Weight &amp; Body</span></td><td>Weight over time, trend charts, notes</td><td><span class="phase-tag p2">Phase 2</span></td></tr>
+          <tr><td><span class="m-name">Foods &amp; Recipes</span></td><td>Favorite foods, recipes, ingredients, prep &amp; cook time, cost per meal, favorite shops</td><td><span class="phase-tag p2">Phase 2</span></td></tr>
           <tr><td><span class="m-name">Spending &amp; Money</span></td><td>Upload bank statements, auto-sort spending, spot where you overspent vs a budget</td><td><span class="phase-tag p3">Phase 3</span></td></tr>
           <tr><td><span class="m-name">Time &amp; Habits</span></td><td>How you spend your time, routines, habits</td><td><span class="phase-tag p3">Phase 3</span></td></tr>
-          <tr><td><span class="m-name">Home Dashboard</span></td><td>One screen: what's due, latest weight, this week's spend, quick-add anything</td><td><span class="phase-tag p3">Phase 3</span></td></tr>
+          <tr><td><span class="m-name">Home Dashboard</span></td><td>One screen: what's due, this week's spend, quick-add anything</td><td><span class="phase-tag p3">Phase 3</span></td></tr>
+          <tr><td><span class="m-name">Period &amp; Cycle</span></td><td>Log periods &amp; symptoms, see your cycle, predict the next one</td><td><span class="phase-tag p4">Phase 4</span></td></tr>
+          <tr><td><span class="m-name">Weight &amp; Body</span></td><td>Weight over time, trend charts, notes</td><td><span class="phase-tag p4">Phase 4</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -369,8 +370,30 @@
 
 <section>
   <div class="wrap">
-    <p class="eyebrow">Week one, in detail</p>
-    <h2>Module 1 — Foods &amp; Recipes</h2>
+    <p class="eyebrow berry">Phase 1 · first to build</p>
+    <h2>Module 1 — Personal Info Vault</h2>
+    <p>Every "where's that detail again?" answered in one place: medical aid, insurance, internet, rent, car, ID numbers, account numbers. Because some of this is genuinely sensitive, the vault has an extra rule — the private fields are <strong>encrypted on your phone</strong> before syncing, so no server ever sees them in the clear.</p>
+    <div class="card schema" style="margin-top:6px;">
+      <div class="field"><span class="fname">category</span><span class="ftype">Medical Aid · Insurance · Internet · Rent · Car · ID &amp; Docs · Utilities · Subscriptions</span></div>
+      <div class="field"><span class="fname">title</span><span class="ftype">text — e.g. "Discovery Health"</span></div>
+      <div class="field"><span class="fname">provider</span><span class="ftype">company &amp; contact number</span></div>
+      <div class="field"><span class="fname">account_no</span><span class="ftype">policy / member / account number <span class="lock">🔒 locked</span></span></div>
+      <div class="field"><span class="fname">id_number</span><span class="ftype">for ID &amp; documents <span class="lock">🔒 locked</span></span></div>
+      <div class="field"><span class="fname">monthly_cost</span><span class="ftype">R — feeds your money view later</span></div>
+      <div class="field"><span class="fname">renewal_date</span><span class="ftype">date — becomes a reminder</span></div>
+      <div class="field"><span class="fname">documents</span><span class="ftype">photos of cards / policies (optional)</span></div>
+      <div class="field"><span class="fname">notes</span><span class="ftype">anything else</span></div>
+    </div>
+    <div class="callout berry">
+      <p><span class="h">On safety</span>Fields marked <strong>🔒 locked</strong> are scrambled with a passphrase only you know (built on your phone's own encryption). Even if someone got into the cloud account, those fields would be unreadable. The trade-off: forget the passphrase and those fields can't be recovered — so we'll set that up carefully, together.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Phase 2 · your cookbook</p>
+    <h2>Module 2 — Foods &amp; Recipes</h2>
     <p>A living cookbook of <em>your</em> foods. Every recipe knows its ingredients, and every ingredient knows what it costs and where you buy it — so the app can tell you the <strong>total cost of a meal</strong> and how long it takes, automatically.</p>
     <div class="card schema" style="margin-top:6px;">
       <div class="field"><span class="fname">name</span><span class="ftype">text — e.g. "Chicken curry"</span></div>
@@ -392,28 +415,6 @@
 
 <section>
   <div class="wrap">
-    <p class="eyebrow berry">Week one, in detail</p>
-    <h2>Module 2 — Personal Info Vault</h2>
-    <p>Every "where's that detail again?" answered in one place: medical aid, insurance, internet, rent, car, ID numbers, account numbers. Because some of this is genuinely sensitive, the vault has an extra rule — the private fields are <strong>encrypted on your phone</strong> before syncing, so no server ever sees them in the clear.</p>
-    <div class="card schema" style="margin-top:6px;">
-      <div class="field"><span class="fname">category</span><span class="ftype">Medical Aid · Insurance · Internet · Rent · Car · ID &amp; Docs · Utilities · Subscriptions</span></div>
-      <div class="field"><span class="fname">title</span><span class="ftype">text — e.g. "Discovery Health"</span></div>
-      <div class="field"><span class="fname">provider</span><span class="ftype">company &amp; contact number</span></div>
-      <div class="field"><span class="fname">account_no</span><span class="ftype">policy / member / account number <span class="lock">🔒 locked</span></span></div>
-      <div class="field"><span class="fname">id_number</span><span class="ftype">for ID &amp; documents <span class="lock">🔒 locked</span></span></div>
-      <div class="field"><span class="fname">monthly_cost</span><span class="ftype">R — feeds your money view later</span></div>
-      <div class="field"><span class="fname">renewal_date</span><span class="ftype">date — becomes a reminder</span></div>
-      <div class="field"><span class="fname">documents</span><span class="ftype">photos of cards / policies (optional)</span></div>
-      <div class="field"><span class="fname">notes</span><span class="ftype">anything else</span></div>
-    </div>
-    <div class="callout berry">
-      <p><span class="h">On safety</span>Fields marked <strong>🔒 locked</strong> are scrambled with a passphrase only you know (built on your phone's own encryption). Even if someone got into the cloud account, those fields would be unreadable. The trade-off: forget the passphrase and those fields can't be recovered — so we'll set that up carefully, together.</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
     <p class="eyebrow honey">The build order</p>
     <h2>How we get there, phase by phase</h2>
     <p style="margin-bottom:26px;">Each phase ends with something real you can use on your phone — never a half-finished screen. You try it, tell me what's wrong, and we move on.</p>
@@ -427,32 +428,31 @@
       </div>
     </div>
     <div class="phase">
-      <div class="phase-num">1</div>
+      <div class="phase-num c-berry">1</div>
       <div>
-        <span class="when">Your week-one choices</span>
-        <h3>Foods &amp; Recipes + Personal Info Vault</h3>
+        <span class="when">Your reference vault</span>
+        <h3>Personal Info Vault</h3>
         <ul class="clean">
-          <li>Add foods with ingredients, time, and auto-calculated cost</li>
-          <li>Favorites view and favorite-shops list</li>
-          <li>The vault, with locked fields for the sensitive bits</li>
+          <li>Medical aid, insurance, internet, rent, car, ID &amp; documents in one place</li>
+          <li>Locked fields for the sensitive bits, set up with your passphrase</li>
           <li>First reminders: policy renewals &amp; rent due</li>
         </ul>
       </div>
     </div>
     <div class="phase">
-      <div class="phase-num">2</div>
+      <div class="phase-num c-honey">2</div>
       <div>
-        <span class="when">Your body</span>
-        <h3>Period &amp; Cycle + Weight</h3>
+        <span class="when">Your cookbook</span>
+        <h3>Foods &amp; Recipes</h3>
         <ul class="clean">
-          <li>Log periods and symptoms; predict the next cycle</li>
-          <li>Weight over time with a simple trend chart</li>
-          <li>"Period likely soon" and weigh-in reminders</li>
+          <li>Add foods with ingredients, time, and auto-calculated cost</li>
+          <li>Favorites view and favorite-shops list</li>
+          <li>See a meal's total cost and cost per serving update itself</li>
         </ul>
       </div>
     </div>
     <div class="phase">
-      <div class="phase-num">3</div>
+      <div class="phase-num c-ink">3</div>
       <div>
         <span class="when">Money &amp; time</span>
         <h3>Spending, Time, and the Home Dashboard</h3>
@@ -461,6 +461,18 @@
           <li>Budgets and "you overspent here" flags</li>
           <li>Time &amp; habits tracking</li>
           <li>A home screen that pulls it all together at a glance</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num c-berry">4</div>
+      <div>
+        <span class="when">Your body</span>
+        <h3>Period &amp; Cycle + Weight</h3>
+        <ul class="clean">
+          <li>Log periods and symptoms; predict the next cycle</li>
+          <li>Weight over time with a simple trend chart</li>
+          <li>"Period likely soon" and weigh-in reminders</li>
         </ul>
       </div>
     </div>
@@ -501,14 +513,14 @@
 <footer class="end">
   <div class="wrap">
     <div class="cta">
-      <h2 class="display">So — where do we point the shovel?</h2>
-      <p>The plan's ready. The natural next move is to build <strong>Phase 0 + Phase 1</strong>: a real app you can add to your home screen, with Foods &amp; Recipes and your Vault working. But it's your call.</p>
+      <h2 class="display">Next: your look, then we build</h2>
+      <p>Phases are reordered the way you asked — <strong>Vault → Foods → Money &amp; Time → Body</strong>. The one thing still open is the <strong>style</strong>: cute, pretty colours, sparkles, something that keeps you coming back.</p>
       <div class="opts">
-        <div class="opt"><strong>A.</strong> Build it — start with the app shell + your two week-one modules.</div>
-        <div class="opt"><strong>B.</strong> Tweak the plan first — reorder modules, add something I missed, change a data field.</div>
-        <div class="opt"><strong>C.</strong> Go even smaller — one single screen (say, Foods) to feel it on your phone before anything else.</div>
+        <div class="opt"><strong>1.</strong> Drop your colour / font / style inspiration <strong>in the chat</strong> — I'll design the whole app around it.</div>
+        <div class="opt"><strong>2.</strong> Answer a couple of style questions so the "cute" is tuned to you, not generic.</div>
+        <div class="opt"><strong>3.</strong> Then I build <strong>Phase 0 (the shell) + Phase 1 (your Vault)</strong> — real, on your home screen.</div>
       </div>
-      <p style="margin-top:16px; font-size:14px;">Tell me A, B, or C — and anything you'd change.</p>
+      <p style="margin-top:16px; font-size:14px;">The blueprint's yours now — send the pretty stuff whenever you're ready. ✨</p>
     </div>
   </div>
 </footer>

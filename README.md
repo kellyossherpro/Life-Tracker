@@ -21,7 +21,7 @@ encrypted on-device before it ever syncs.
 | Sensitive fields | **Encrypted on the phone** (passphrase only Kelly knows) before syncing |
 | Currency | **South African Rand (R)** |
 | Reminders | **On** — driven by due dates (rent, renewals, cycle, weigh-ins) |
-| Start with | **Foods & Recipes** + **Personal Info Vault** |
+| Start with | **Personal Info Vault** (Phase 1), then **Foods & Recipes** (Phase 2) |
 
 ## Proposed stack (all free)
 
@@ -38,9 +38,17 @@ encrypted on-device before it ever syncs.
 ## Roadmap
 
 - **Phase 0 — Foundation:** installable app shell, navigation, offline storage, login, encrypted sync.
-- **Phase 1 — Week-one modules:** Foods & Recipes (ingredients → auto cost & time, favorites, shops) + Personal Info Vault (locked sensitive fields, renewal reminders).
-- **Phase 2 — Body:** Period & Cycle (log, symptoms, predictions) + Weight (trends).
-- **Phase 3 — Money & time:** bank-statement import (CSV then PDF) + budgets + Time/Habits + Home Dashboard.
+- **Phase 1 — Personal Info Vault:** medical aid, insurance, internet, rent, car, ID & documents; locked sensitive fields; renewal/rent reminders.
+- **Phase 2 — Foods & Recipes:** ingredients → auto cost & time, favorites, favorite shops.
+- **Phase 3 — Money & Time:** bank-statement import (CSV then PDF) + budgets + Time/Habits + Home Dashboard.
+- **Phase 4 — Body:** Period & Cycle (log, symptoms, predictions) + Weight (trends).
+
+## Style direction
+
+Kelly's taste: **cute, pretty colours, sparkles** — playful delight is a first-class
+design goal (it's what keeps the app in daily use), balanced against readability for
+reference data. Palette, fonts, and animation to be finalized from Kelly's own
+inspiration images. Sensitive vault text stays high-contrast and legible regardless.
 
 ## Data models (Phase 1)
 
