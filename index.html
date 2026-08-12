@@ -84,8 +84,10 @@
   .brand{font-family:var(--font-display); font-weight:800; font-size:24px; letter-spacing:-.01em;
     background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
   .brand .spk{-webkit-text-fill-color:initial; color:var(--pink)}
-  .avatar{width:40px;height:40px;border-radius:50%;background:var(--grad);display:grid;place-items:center;
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--grad);display:grid;place-items:center;overflow:hidden;
     color:#fff;font-weight:700;box-shadow:var(--shadow-sm);border:2px solid var(--card);cursor:pointer;font-size:15px}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  .avatar.lg{width:66px;height:66px;font-size:26px;border:3px solid var(--card)}
   .iconbtn{width:40px;height:40px;border-radius:14px;background:var(--card);border:1px solid var(--border);
     display:grid;place-items:center;font-size:17px;cursor:pointer;box-shadow:var(--shadow-sm);color:var(--ink)}
 
@@ -628,7 +630,7 @@
 
     return ''+
     '<div class="appbar"><div class="brand">Life Index <span class="spk">✨</span></div>'+
-      '<div class="avatar" data-nav-go="/more">'+esc((settings.name||'K').trim().charAt(0).toUpperCase())+'</div></div>'+
+      '<div class="avatar" data-nav-go="/more">'+(settings.avatar?'<img src="'+esc(settings.avatar)+'" alt="">':esc((settings.name||'K').trim().charAt(0).toUpperCase()))+'</div></div>'+
     '<div class="greet"><p class="hi">'+greeting()+'</p><div class="name">'+esc(settings.name||'you')+' ✨</div>'+
       '<div class="sub">Here’s your life, beautifully in order.</div></div>'+
 
@@ -735,7 +737,17 @@
     return ''+
     '<div class="screen-head"><div><h2 class="title">More ✨</h2><div class="sub">Make it yours.</div></div></div>'+
     '<div class="section-label">You</div>'+
-    '<div class="card tight"><div class="field" style="margin:0"><label>Your name</label><input id="s-name" value="'+esc(settings.name)+'"></div></div>'+
+    '<div class="card tight" style="display:flex;flex-direction:column;gap:14px">'+
+      '<div style="display:flex;align-items:center;gap:14px">'+
+        '<div class="avatar lg" id="s-avatar">'+(settings.avatar?'<img src="'+esc(settings.avatar)+'" alt="">':esc((settings.name||'K').trim().charAt(0).toUpperCase()))+'</div>'+
+        '<div style="display:flex;flex-wrap:wrap;gap:8px">'+
+          '<button class="btn ghost sm" id="s-avatar-btn" style="width:auto">📷 '+(settings.avatar?'Change photo':'Add a photo')+'</button>'+
+          (settings.avatar?'<button class="btn ghost sm" id="s-avatar-rm" style="width:auto">Remove</button>':'')+
+        '</div>'+
+      '</div>'+
+      '<div class="field" style="margin:0"><label>Your name</label><input id="s-name" value="'+esc(settings.name)+'"></div>'+
+      '<input type="file" id="s-avatar-file" accept="image/*" class="hidden">'+
+    '</div>'+
     '<div class="section-label">🔒 Privacy &amp; lock</div>'+
     '<div class="card tight" style="display:flex;flex-direction:column;gap:10px">'+
       (hasPIN()
@@ -1360,6 +1372,9 @@
 
     // More screen
     var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
+    var avBtn=$('#s-avatar-btn'), avFile=$('#s-avatar-file');
+    if(avBtn&&avFile){ avBtn.onclick=function(){avFile.click()}; avFile.onchange=function(){var f=avFile.files[0]; if(!f)return; if(f.size>3.5*1024*1024){toast('Try a smaller image (under ~3MB) 💜');return;} var rd=new FileReader(); rd.onload=function(){settings.avatar=rd.result; save(K.settings,settings); toast('Looking lovely 💜'); render();}; rd.readAsDataURL(f);}; }
+    var avRm=$('#s-avatar-rm'); if(avRm) avRm.onclick=function(){delete settings.avatar; save(K.settings,settings); toast('Photo removed'); render();};
     var setpin=$('#s-setpin'); if(setpin) setpin.onclick=function(){showLock('set')};
     var chgpin=$('#s-changepin'); if(chgpin) chgpin.onclick=function(){showLock('set')};
     var rmpin=$('#s-removepin'); if(rmpin) rmpin.onclick=function(){if(confirm('Turn off the app lock? Anyone who opens the app will be able to see your data.')){delete settings.pin; delete settings.bio; save(K.settings,settings); toast('Lock turned off'); render();}};
@@ -1440,7 +1455,8 @@
     var extra = lockMode==='unlock'
       ? ((settings.bio&&bioSupported()?'<button class="lock-link" data-bio>👆 Use fingerprint / Face ID</button>':'')+'<button class="lock-link" data-forgot>Forgot your PIN?</button>')
       : '<button class="lock-link" data-cancelpin>Cancel</button>';
-    $('#lockscreen').innerHTML='<div class="lock-logo">🪐</div><div class="lock-title">'+titles[lockMode]+'</div>'+
+    var logo = settings.avatar? '<div class="lock-logo"><img src="'+esc(settings.avatar)+'" alt="" style="width:76px;height:76px;border-radius:50%;object-fit:cover;box-shadow:var(--shadow)"></div>' : '<div class="lock-logo">🪐</div>';
+    $('#lockscreen').innerHTML=logo+'<div class="lock-title">'+titles[lockMode]+'</div>'+
       '<div class="lock-sub" id="lock-sub">'+subs[lockMode]+'</div><div class="pin-dots" id="pin-dots">'+dots+'</div>'+
       '<div class="keypad">'+keys+'</div>'+extra;
     var ls=$('#lockscreen');
@@ -1502,7 +1518,12 @@
   });
 
   /* ---------- PWA (harmless where unsupported) ---------- */
-  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('./sw.js').catch(function(){}); }catch(e){} }
+  if('serviceWorker' in navigator){
+    var refreshing=false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){ if(refreshing)return; refreshing=true; location.reload(); });
+    try{ navigator.serviceWorker.register('./sw.js').then(function(reg){ try{reg.update();}catch(e){}
+      setInterval(function(){ try{reg.update();}catch(e){} }, 60*60*1000); }).catch(function(){}); }catch(e){}
+  }
 
   if(hasPIN()) lock(); else render();
 })();
