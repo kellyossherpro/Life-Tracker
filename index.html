@@ -478,9 +478,9 @@
 <nav class="nav">
   <div class="nav-inner">
     <button class="nav-item" data-nav="/"><span class="ic">🏠</span>Home</button>
-    <button class="nav-item" data-nav="/vault"><span class="ic">🗝️</span>Vault</button>
+    <button class="nav-item" data-nav="/planner"><span class="ic">🗓️</span>Planner</button>
     <button class="fab" id="fab" aria-label="Quick add">＋</button>
-    <button class="nav-item" data-nav="/recipes"><span class="ic">🍳</span>Recipes</button>
+    <button class="nav-item" data-nav="/vault"><span class="ic">🗝️</span>Vault</button>
     <button class="nav-item" data-nav="/more"><span class="ic">✨</span>More</button>
   </div>
 </nav>
@@ -615,10 +615,21 @@
   var toastT;
   function toast(msg){var el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){el.classList.remove('show')},2200)}
 
-  /* ---------- router ---------- */
-  function go(path){ if(location.hash!=='#'+path) location.hash='#'+path; else render(); }
+  /* ---------- router (back → Home, then → close) ---------- */
+  var navDepth=0;
   function current(){var h=location.hash.replace(/^#/,''); return h||'/';}
-  window.addEventListener('hashchange',render);
+  function go(path){
+    var cur=current();
+    if(path===cur){ render(); return; }
+    if(path==='/'){
+      if(navDepth>0){ history.go(-navDepth); return; }   // pop back to the Home base; popstate renders
+      history.replaceState({},'','#/'); navDepth=0; render(); return;
+    }
+    if(cur==='/' && navDepth===0){ history.pushState({},'','#'+path); navDepth=1; }
+    else { history.replaceState({},'','#'+path); }        // page→page keeps a single level
+    render();
+  }
+  window.addEventListener('popstate', function(){ navDepth=(current()==='/')?0:1; render(); });
 
   function setNav(path){
     var base='/'+ (path.split('/')[1]||'');
@@ -660,15 +671,7 @@
       '<div class="stat"><div class="k">Monthly bills</div><div class="v">'+money(monthly).replace(settings.currency,settings.currency+' ')+'</div></div></div>'+
     '</div>'+
 
-    '<div class="section-label">💫 Quick Add</div>'+
-    '<div class="qa-grid">'+
-      '<div class="qa" data-nav-go="/todos"><span class="e b-lav">📝</span>To-Do</div>'+
-      '<div class="qa" data-nav-go="/reminders/new"><span class="e b-pink">🔔</span>Reminder</div>'+
-      '<div class="qa" data-nav-go="/smoke"><span class="e b-mint">🌿</span>Smoke Log</div>'+
-      '<div class="qa" data-nav-go="/money/new"><span class="e b-yellow">💸</span>Add Expense</div>'+
-      '<div class="qa" data-nav-go="/body"><span class="e b-pink">🌸</span>My Body</div>'+
-      '<div class="qa" data-nav-go="/habits"><span class="e b-mint">🔥</span>Habits</div>'+
-    '</div>';
+    '';
   }
 
   var vaultFilter='all';
@@ -793,8 +796,7 @@
       '<div class="snap-row" data-nav-go="/recipes" style="cursor:pointer"><div class="bubble b-pink">🍳</div><div class="txt"><div class="big">Recipes</div><div class="lead">Ready now · Phase 2</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/money" style="cursor:pointer"><div class="bubble b-mint">💸</div><div class="txt"><div class="big">Spending</div><div class="lead">Ready now · Phase 3</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/body" style="cursor:pointer"><div class="bubble b-yellow">🌸</div><div class="txt"><div class="big">My Body</div><div class="lead">Weight · periods · moods · Phase 4</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
-      '<div class="snap-row" data-nav-go="/todos" style="cursor:pointer"><div class="bubble b-lav">📝</div><div class="txt"><div class="big">To-Do</div><div class="lead">Your checklist</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
-      '<div class="snap-row" data-nav-go="/reminders" style="cursor:pointer"><div class="bubble b-pink">🔔</div><div class="txt"><div class="big">Reminders</div><div class="lead">Birthdays · events · nudges</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row" data-nav-go="/planner" style="cursor:pointer"><div class="bubble b-lav">🗓️</div><div class="txt"><div class="big">Planner</div><div class="lead">To-do & reminders</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/habits" style="cursor:pointer"><div class="bubble b-mint">🔥</div><div class="txt"><div class="big">Habits</div><div class="lead">Daily streaks</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/smoke" style="cursor:pointer"><div class="bubble b-mint">🌿</div><div class="txt"><div class="big">Smoke Log</div><div class="lead">Joints · pens · bongs</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
     '</div></div>'+
@@ -1123,7 +1125,7 @@
   }
 
   /* ---------- To-Do ---------- */
-  function screenTodos(){
+  function todosBody(){
     var active=todos.filter(function(t){return !t.done});
     var done=todos.filter(function(t){return t.done});
     active.sort(function(a,b){return (b.star?1:0)-(a.star?1:0) || (b.createdAt||0)-(a.createdAt||0)});
@@ -1136,8 +1138,11 @@
       ? '<div class="empty" style="padding:34px"><div class="em">📝</div><h3>Nothing to do… yet</h3><p>Add your first task above and tick it off when it’s done ✨</p></div>'
       : '<div class="card">'+(active.length?active.map(row).join(''):'<div style="text-align:center;color:var(--ink-soft);padding:16px;font-size:14px">All done — nice work! 🎉</div>')+'</div>'+
         (done.length?'<div class="section-label">Done · '+done.length+'<button class="lock-link" id="clr-done" style="margin-left:auto;color:var(--ink-faint);font-size:12px;text-decoration:none">Clear</button></div><div class="card">'+done.map(row).join('')+'</div>':'');
-    return '<div class="screen-head"><div><h2 class="title">To-Do 📝</h2><div class="sub">'+(active.length?active.length+' to go':(todos.length?'All caught up 🎉':'Your checklist'))+'</div></div></div>'+
-      '<form id="todoform" class="todo-add"><input name="text" placeholder="Add a task…" autocomplete="off"><button class="btn" type="submit">Add</button></form>'+list;
+    return '<form id="todoform" class="todo-add"><input name="text" placeholder="Add a task…" autocomplete="off"><button class="btn" type="submit">Add</button></form>'+list;
+  }
+  function screenTodos(){
+    var active=todos.filter(function(t){return !t.done});
+    return '<div class="screen-head"><div><h2 class="title">To-Do 📝</h2><div class="sub">'+(active.length?active.length+' to go':(todos.length?'All caught up 🎉':'Your checklist'))+'</div></div></div>'+todosBody();
   }
 
   /* ---------- Reminders ---------- */
@@ -1149,20 +1154,30 @@
     return r.date;
   }
   function remBadge(iso){var d=new Date(iso+'T00:00:00'); return {d:d.getDate(), m:d.toLocaleDateString('en-ZA',{month:'short'})};}
-  function screenReminders(){
+  function remindersBody(){
     var items=reminders.map(function(r){var nx=remNext(r); return {r:r,next:nx,days:daysUntil(nx)};}).filter(function(x){return x.next;});
     items.sort(function(a,b){return (a.days==null?99999:a.days)-(b.days==null?99999:b.days);});
-    var list = reminders.length===0
-      ? '<div class="empty" style="padding:34px"><div class="em">🔔</div><h3>No reminders yet</h3><p>Add birthdays, events, or nudges about your to-dos — I’ll keep them in order.</p><div class="center-x" style="margin-top:16px"><button class="btn sm" data-nav-go="/reminders/new">✨ Add a reminder</button></div></div>'
-      : '<div class="card">'+items.map(function(x){var r=x.r; var b=remBadge(x.next); var ty=REM_TYPE[r.type]||REM_TYPE.reminder;
-          var sub=ty.label; if(r.type==='reminder'&&r.todoId){var td=todos.find(function(t){return t.id===r.todoId}); if(td) sub='⏰ '+td.text;}
-          else if(r.note) sub=ty.label+' · '+r.note;
-          if(r.type==='birthday'&&/^\d{4}/.test(r.date)&&+r.date.slice(0,4)>1900){var age=new Date(x.next).getFullYear()-(+r.date.slice(0,4)); if(age>0&&age<130) sub='🎂 Turns '+age;}
-          return '<div class="rem-row" data-remopen="'+r.id+'"><div class="rem-date"><div class="rd-d">'+b.d+'</div><div class="rd-m">'+b.m+'</div></div>'+
-            '<div class="meta"><div class="rt">'+ty.icon+' '+esc(r.title)+'</div><div class="rs">'+esc(sub)+'</div></div>'+
-            '<div class="rwhen '+(x.days<=7?'soon':'')+'">'+whenText(x.days)+'</div></div>';}).join('')+'</div>';
-    return '<div class="screen-head"><div><h2 class="title">Reminders 🔔</h2><div class="sub">Birthdays, events &amp; nudges.</div></div>'+
-      '<button class="iconbtn" data-nav-go="/reminders/new">＋</button></div>'+list;
+    if(reminders.length===0)
+      return '<div class="empty" style="padding:34px"><div class="em">🔔</div><h3>No reminders yet</h3><p>Add birthdays, events, or nudges about your to-dos — I’ll keep them in order.</p><div class="center-x" style="margin-top:16px"><button class="btn sm" data-nav-go="/reminders/new">✨ Add a reminder</button></div></div>';
+    var list='<div class="card">'+items.map(function(x){var r=x.r; var b=remBadge(x.next); var ty=REM_TYPE[r.type]||REM_TYPE.reminder;
+        var sub=ty.label; if(r.type==='reminder'&&r.todoId){var td=todos.find(function(t){return t.id===r.todoId}); if(td) sub='⏰ '+td.text;}
+        else if(r.note) sub=ty.label+' · '+r.note;
+        if(r.type==='birthday'&&/^\d{4}/.test(r.date)&&+r.date.slice(0,4)>1900){var age=new Date(x.next).getFullYear()-(+r.date.slice(0,4)); if(age>0&&age<130) sub='🎂 Turns '+age;}
+        return '<div class="rem-row" data-remopen="'+r.id+'"><div class="rem-date"><div class="rd-d">'+b.d+'</div><div class="rd-m">'+b.m+'</div></div>'+
+          '<div class="meta"><div class="rt">'+ty.icon+' '+esc(r.title)+'</div><div class="rs">'+esc(sub)+'</div></div>'+
+          '<div class="rwhen '+(x.days<=7?'soon':'')+'">'+whenText(x.days)+'</div></div>';}).join('')+'</div>';
+    return '<button class="btn ghost sm" data-nav-go="/reminders/new" style="width:auto;margin-bottom:12px">＋ Add a reminder</button>'+list;
+  }
+  function screenReminders(){
+    return '<div class="screen-head"><div><h2 class="title">Reminders 🔔</h2><div class="sub">Birthdays, events &amp; nudges.</div></div></div>'+remindersBody();
+  }
+
+  var plannerTab='todos';
+  function screenPlanner(){
+    var tabs='<div class="tabs">'+[['todos','📝 To-Do'],['reminders','🔔 Reminders']]
+      .map(function(t){return '<button class="tab '+(plannerTab===t[0]?'on':'')+'" data-ptab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
+    var bodyC = plannerTab==='reminders'? remindersBody() : todosBody();
+    return '<div class="screen-head"><div><h2 class="title">Planner 🗓️</h2><div class="sub">Tasks &amp; reminders.</div></div></div>'+tabs+bodyC;
   }
   function screenReminderForm(id){
     var r=id? reminders.find(function(x){return x.id===id}) : {type:'reminder',title:'',date:today(),note:'',todoId:''};
@@ -1171,7 +1186,7 @@
     var active=todos.filter(function(t){return !t.done});
     var todoOpts='<option value="">— none —</option>'+active.map(function(t){return '<option value="'+t.id+'" '+(r.todoId===t.id?'selected':'')+'>'+esc(t.text.slice(0,40))+'</option>';}).join('');
     return '<div class="screen-head"><div><h2 class="title">'+(id?'Edit reminder':'New reminder')+'</h2></div>'+
-      '<button class="iconbtn" data-nav-go="/reminders">✕</button></div>'+
+      '<button class="iconbtn" data-nav-go="/planner">✕</button></div>'+
     '<form id="remform">'+
       '<div class="field"><label>Type</label><select name="type">'+typeOpts+'</select></div>'+
       '<div class="field"><label>Title</label><input name="title" placeholder="e.g. Mom’s birthday" value="'+esc(r.title)+'" required></div>'+
@@ -1254,6 +1269,7 @@
     else if(path==='/money/new') html=screenSpendForm(null);
     else if(seg[1]==='money'&&seg[2]==='edit'&&seg[3]) html=screenSpendForm(seg[3]);
     else if(path==='/money/budgets') html=screenBudgets();
+    else if(path==='/planner') html=screenPlanner();
     else if(path==='/todos') html=screenTodos();
     else if(path==='/reminders') html=screenReminders();
     else if(path==='/reminders/new') html=screenReminderForm(null);
@@ -1412,6 +1428,9 @@
     document.querySelectorAll('[data-tdel]').forEach(function(el){el.onclick=function(){todos=todos.filter(function(x){return x.id!==el.getAttribute('data-tdel')}); save(K.todos,todos); render();}});
     var clrDone=$('#clr-done'); if(clrDone) clrDone.onclick=function(){todos=todos.filter(function(t){return !t.done}); save(K.todos,todos); toast('Cleared'); render();};
 
+    // Planner tabs
+    document.querySelectorAll('[data-ptab]').forEach(function(el){el.onclick=function(){plannerTab=el.getAttribute('data-ptab'); render();}});
+
     // Reminders
     document.querySelectorAll('[data-remopen]').forEach(function(el){el.onclick=function(){go('/reminders/edit/'+el.getAttribute('data-remopen'))}});
     var remform=$('#remform'); if(remform){
@@ -1420,8 +1439,8 @@
         if(!obj.title){toast('Give it a title ✨');return;} if(!obj.date){toast('Pick a date');return;}
         if(id){var i=reminders.findIndex(function(x){return x.id===id}); if(i>-1) reminders[i]=Object.assign({},reminders[i],obj);}
         else{obj.id=uid(); reminders.push(obj);}
-        save(K.reminders,reminders); toast(id?'Saved 💜':'Reminder added ✨'); go('/reminders');};
-      var rd=$('[data-remdel]',remform); if(rd) rd.onclick=function(){if(confirm('Delete this reminder?')){var did=rd.getAttribute('data-remdel'); reminders=reminders.filter(function(x){return x.id!==did}); save(K.reminders,reminders); toast('Deleted'); go('/reminders');}};
+        save(K.reminders,reminders); plannerTab='reminders'; toast(id?'Saved 💜':'Reminder added ✨'); go('/planner');};
+      var rd=$('[data-remdel]',remform); if(rd) rd.onclick=function(){if(confirm('Delete this reminder?')){var did=rd.getAttribute('data-remdel'); reminders=reminders.filter(function(x){return x.id!==did}); save(K.reminders,reminders); plannerTab='reminders'; toast('Deleted'); go('/planner');}};
     }
 
     // Habits
@@ -1593,6 +1612,7 @@
       setInterval(function(){ try{reg.update();}catch(e){} }, 60*60*1000); }).catch(function(){}); }catch(e){}
   }
 
+  navDepth = (current()==='/')?0:1;
   if(hasPIN()) lock(); else render();
 })();
 </script>
