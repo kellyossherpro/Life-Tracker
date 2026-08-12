@@ -74,6 +74,10 @@ high-contrast and legible.
 - ✅ **PWA install polish**: PNG app icons (incl. apple-touch), verified working under a GitHub Pages project subpath.
 - ⬜ Remaining: enable GitHub Pages (one settings toggle), optional cloud sync, optional delight layer (mascot, confetti).
 
-**Vault** also now supports insurance sub-types, an Investments category, and per-entry website + login (username/masked password).
+**Vault** also supports insurance sub-types, Investments, an **Email & Logins** category
+(nickname / email / masked password) and per-entry website + login.
+
+**Smoke Log** 🌿: tap Joint / Pen / Bong, pick hits (1–10) — daily & weekly tally, per-method
+breakdown, history. **Profile picture** in More (shows on Home + lock screen).
 
 The app lives in `index.html` (self-contained) with `manifest.webmanifest`, `sw.js`, and `icons/`.

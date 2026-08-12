@@ -390,6 +390,22 @@
   .habit-week .wd.on{background:var(--lavender);border-color:transparent}
   .flame{color:var(--warn); font-weight:700}
 
+  /* Smoke Log */
+  .method-row{display:flex; gap:10px; margin:6px 0 16px}
+  .method{flex:1; padding:16px 8px; border-radius:18px; border:1.5px solid var(--border); background:var(--card-2);
+    text-align:center; cursor:pointer; transition:transform .12s ease, background .15s, border-color .15s; box-shadow:var(--shadow-sm)}
+  .method:active{transform:scale(.96)}
+  .method.on{background:var(--grad); border-color:transparent; color:#fff; box-shadow:var(--shadow-sm)}
+  .method .mi{font-size:30px; display:block; margin-bottom:5px}
+  .method .ml{font-size:13px; font-weight:600}
+  .hit-chips{display:grid; grid-template-columns:repeat(5,1fr); gap:9px}
+  .hit{padding:15px 0; border-radius:14px; border:1px solid var(--border); background:var(--card); color:var(--ink);
+    font-weight:700; font-size:17px; cursor:pointer; text-align:center; box-shadow:var(--shadow-sm); transition:transform .1s ease}
+  .hit:active{transform:scale(.92); background:var(--pink-soft)}
+  .smoke-mini{display:flex; gap:8px; justify-content:center; margin-top:10px; flex-wrap:wrap}
+  .smoke-mini .sm{font-size:12.5px; color:var(--ink-soft); background:var(--card-2); border:1px solid var(--border-2); padding:5px 11px; border-radius:999px}
+  .smoke-mini .sm b{color:var(--ink)}
+
   /* Bottom nav */
   .nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; padding:0 0 max(12px,env(safe-area-inset-bottom))}
   .nav-inner{display:flex; align-items:center; justify-content:space-around; gap:2px; width:min(500px,calc(100% - 24px));
@@ -481,7 +497,7 @@
   var app=$('#app');
 
   /* ---------- storage ---------- */
-  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
+  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', smoke:'lifeindex.smoke', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
   var settings=load(K.settings,{name:'Kelly', currency:'R'});
@@ -494,6 +510,8 @@
   var todos=load(K.todos,[]);
   var reminders=load(K.reminders,[]);
   var habits=load(K.habits,[]);
+  var smoke=load(K.smoke,[]);
+  var SMOKE_METHODS={joint:{l:'Joint',i:'🚬'},pen:{l:'Pen',i:'💨'},bong:{l:'Bong',i:'🫧'}};
 
   var SPEND_CATS={
     groceries:{label:'Groceries',icon:'🛒',color:'#8E6BFF'},
@@ -548,6 +566,7 @@
     subscriptions:{label:'Subscriptions',icon:'📺',b:'b-pink'},
     banking:{label:'Banking',icon:'🏦',b:'b-lav'},
     investments:{label:'Investments',icon:'📈',b:'b-mint'},
+    logins:{label:'Email & Logins',icon:'📧',b:'b-pink'},
     other:{label:'Other',icon:'📎',b:'b-mint'}
   };
   var INS_TYPES=['Car','Pet','Home','Life','Funeral','Travel','Gadget / Device','Medical gap','Other'];
@@ -644,10 +663,10 @@
     '<div class="qa-grid">'+
       '<div class="qa" data-nav-go="/todos"><span class="e b-lav">📝</span>To-Do</div>'+
       '<div class="qa" data-nav-go="/reminders/new"><span class="e b-pink">🔔</span>Reminder</div>'+
+      '<div class="qa" data-nav-go="/smoke"><span class="e b-mint">🌿</span>Smoke Log</div>'+
       '<div class="qa" data-nav-go="/money/new"><span class="e b-yellow">💸</span>Add Expense</div>'+
-      '<div class="qa" data-nav-go="/body"><span class="e b-mint">🌸</span>My Body</div>'+
-      '<div class="qa" data-nav-go="/recipes/new"><span class="e b-pink">🍳</span>Add Recipe</div>'+
-      '<div class="qa" data-nav-go="/vault/new"><span class="e b-lav">🗝️</span>Vault</div>'+
+      '<div class="qa" data-nav-go="/body"><span class="e b-pink">🌸</span>My Body</div>'+
+      '<div class="qa" data-nav-go="/habits"><span class="e b-mint">🔥</span>Habits</div>'+
     '</div>';
   }
 
@@ -699,7 +718,7 @@
     '<form id="vform">'+
       '<div class="field"><label>Category</label><select name="category">'+opts+'</select></div>'+
       '<div class="field" id="subtype-wrap" style="'+(e.category==='insurance'?'':'display:none')+'"><label>Type of insurance</label><select name="subtype">'+insOpts+'</select></div>'+
-      '<div class="field"><label>Name</label><input name="title" placeholder="e.g. Essential Med" value="'+esc(e.title)+'" required></div>'+
+      '<div class="field"><label id="v-namelabel">'+(e.category==='logins'?'Nickname':'Name')+'</label><input name="title" id="v-nameinput" placeholder="'+(e.category==='logins'?'e.g. Personal Gmail':'e.g. Essential Med')+'" value="'+esc(e.title)+'" required></div>'+
       '<div class="field"><label>Provider</label><input name="provider" placeholder="Company name" value="'+esc(e.provider)+'"></div>'+
       '<div class="field"><label>Contact number</label><input name="contact" inputmode="tel" placeholder="Support line" value="'+esc(e.contact)+'"></div>'+
       '<div class="field locked"><label>Policy / account number</label><div class="lockwrap">'+
@@ -773,6 +792,7 @@
       '<div class="snap-row" data-nav-go="/todos" style="cursor:pointer"><div class="bubble b-lav">📝</div><div class="txt"><div class="big">To-Do</div><div class="lead">Your checklist</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/reminders" style="cursor:pointer"><div class="bubble b-pink">🔔</div><div class="txt"><div class="big">Reminders</div><div class="lead">Birthdays · events · nudges</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/habits" style="cursor:pointer"><div class="bubble b-mint">🔥</div><div class="txt"><div class="big">Habits</div><div class="lead">Daily streaks</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row" data-nav-go="/smoke" style="cursor:pointer"><div class="bubble b-mint">🌿</div><div class="txt"><div class="big">Smoke Log</div><div class="lead">Joints · pens · bongs</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
     '</div></div>'+
     '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index — made with 💜 for '+esc(settings.name)+'</div>';
   }
@@ -1184,6 +1204,34 @@
       '<form id="habitform" class="todo-add"><input name="name" placeholder="New daily habit…" autocomplete="off"><button class="btn" type="submit">Add</button></form>'+list;
   }
 
+  /* ---------- Smoke Log ---------- */
+  var smokeMethod='joint';
+  function screenSmoke(){
+    var tstr=today();
+    var todays=smoke.filter(function(s){return s.date===tstr});
+    var hitsToday=todays.reduce(function(a,s){return a+(Number(s.hits)||0);},0);
+    var byM={}; todays.forEach(function(s){byM[s.method]=(byM[s.method]||0)+(Number(s.hits)||0);});
+    var weekAgo=addDays(tstr,-6);
+    var hitsWeek=smoke.filter(function(s){return s.date>=weekAgo&&s.date<=tstr}).reduce(function(a,s){return a+(Number(s.hits)||0);},0);
+
+    var hero='<div class="card"><div class="big-stat"><div class="bv">'+hitsToday+' <small>hit'+(hitsToday===1?'':'s')+'</small></div><div class="bk">Today · '+todays.length+' session'+(todays.length===1?'':'s')+'</div></div>'+
+      '<div class="smoke-mini">'+Object.keys(SMOKE_METHODS).map(function(m){return '<span class="sm">'+SMOKE_METHODS[m].i+' <b>'+(byM[m]||0)+'</b></span>';}).join('')+
+      '<span class="sm">📅 <b>'+hitsWeek+'</b> this week</span></div></div>';
+
+    var methods='<div class="section-label">🌿 Log a session</div>'+
+      '<div class="method-row">'+Object.keys(SMOKE_METHODS).map(function(m){return '<div class="method'+(smokeMethod===m?' on':'')+'" data-method="'+m+'"><span class="mi">'+SMOKE_METHODS[m].i+'</span><span class="ml">'+SMOKE_METHODS[m].l+'</span></div>';}).join('')+'</div>'+
+      '<div style="font-size:13px;color:var(--ink-soft);margin:0 2px 8px">How many hits?</div>'+
+      '<div class="hit-chips">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){return '<button class="hit" data-hits="'+n+'">'+n+'</button>';}).join('')+'</div>';
+
+    var recent=smoke.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);}).slice(0,25);
+    var history = recent.length? '<div class="section-label">Recent</div><div class="card">'+recent.map(function(s){var mm=SMOKE_METHODS[s.method]||SMOKE_METHODS.joint;
+      var t=new Date(s.ts||0); var when=fmtDate(s.date)+' · '+t.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+      return '<div class="log-row"><span style="font-size:20px">'+mm.i+'</span><span class="lv">'+s.hits+' hit'+(s.hits===1?'':'s')+'</span><span class="ln">'+mm.l+' · '+when+'</span><button class="del" data-smdel="'+s.id+'">🗑</button></div>';}).join('')+'</div>'
+      : '';
+
+    return '<div class="screen-head"><div><h2 class="title">Smoke Log 🌿</h2><div class="sub">Tap a method, then your hits.</div></div></div>'+hero+methods+history;
+  }
+
   /* ---------- render ---------- */
   function render(){
     var path=current();
@@ -1207,6 +1255,7 @@
     else if(path==='/reminders/new') html=screenReminderForm(null);
     else if(seg[1]==='reminders'&&seg[2]==='edit'&&seg[3]) html=screenReminderForm(seg[3]);
     else if(path==='/habits') html=screenHabits();
+    else if(path==='/smoke') html=screenSmoke();
     else if(path==='/more') html=screenMore();
     else html=screenNotFound();
 
@@ -1230,7 +1279,11 @@
 
     var form=$('#vform'); if(form){
       var catSel=form.querySelector('[name=category]'), subWrap=$('#subtype-wrap');
-      if(catSel&&subWrap) catSel.onchange=function(){ subWrap.style.display = catSel.value==='insurance'?'':'none'; };
+      if(catSel) catSel.onchange=function(){
+        if(subWrap) subWrap.style.display = catSel.value==='insurance'?'':'none';
+        var isLogin=catSel.value==='logins'; var nl=$('#v-namelabel'), ni=$('#v-nameinput');
+        if(nl) nl.textContent=isLogin?'Nickname':'Name'; if(ni) ni.placeholder=isLogin?'e.g. Personal Gmail':'e.g. Essential Med';
+      };
       var openSite=$('#open-site'); if(openSite) openSite.onclick=function(){
         var u=(form.querySelector('[name=website]').value||'').trim();
         if(!u){toast('Add a website first ✨');return;}
@@ -1370,6 +1423,13 @@
     document.querySelectorAll('[data-hcheck]').forEach(function(el){el.onclick=function(){var h=habits.find(function(x){return x.id===el.getAttribute('data-hcheck')}); if(h){ if(!h.history)h.history={}; var k=dkey(new Date()); if(h.history[k])delete h.history[k]; else h.history[k]=true; save(K.habits,habits); render();}}});
     document.querySelectorAll('[data-hdel]').forEach(function(el){el.onclick=function(){if(confirm('Delete this habit and its streak?')){habits=habits.filter(function(x){return x.id!==el.getAttribute('data-hdel')}); save(K.habits,habits); render();}}});
 
+    // Smoke Log
+    document.querySelectorAll('[data-method]').forEach(function(el){el.onclick=function(){smokeMethod=el.getAttribute('data-method'); render();}});
+    document.querySelectorAll('[data-hits]').forEach(function(el){el.onclick=function(){var n=parseInt(el.getAttribute('data-hits'),10);
+      smoke.push({id:uid(),method:smokeMethod,hits:n,ts:Date.now(),date:today()}); save(K.smoke,smoke);
+      toast(SMOKE_METHODS[smokeMethod].i+' Logged '+n+' hit'+(n===1?'':'s')+' 🌿'); render();}});
+    document.querySelectorAll('[data-smdel]').forEach(function(el){el.onclick=function(){smoke=smoke.filter(function(x){return x.id!==el.getAttribute('data-smdel')}); save(K.smoke,smoke); render();}});
+
     // More screen
     var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
     var avBtn=$('#s-avatar-btn'), avFile=$('#s-avatar-file');
@@ -1386,7 +1446,7 @@
   }
 
   function exportData(){
-    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes,body:body,tx:tx,budgets:budgets,todos:todos,reminders:reminders,habits:habits};
+    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes,body:body,tx:tx,budgets:budgets,todos:todos,reminders:reminders,habits:habits,smoke:smoke};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='life-index-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
@@ -1400,8 +1460,9 @@
       if(data.body){ body=data.body; if(!body.weights)body.weights=[]; if(!body.periods)body.periods=[]; if(!body.moods)body.moods=[]; }
       if(Array.isArray(data.tx)) tx=data.tx; if(data.budgets&&typeof data.budgets==='object') budgets=data.budgets;
       if(Array.isArray(data.todos)) todos=data.todos; if(Array.isArray(data.reminders)) reminders=data.reminders; if(Array.isArray(data.habits)) habits=data.habits;
+      if(Array.isArray(data.smoke)) smoke=data.smoke;
       if(data.settings) settings=Object.assign(settings,data.settings);
-      save(K.vault,vault); save(K.recipes,recipes); save(K.body,body); save(K.tx,tx); save(K.budgets,budgets); save(K.todos,todos); save(K.reminders,reminders); save(K.habits,habits); save(K.settings,settings); toast('Restored 💜'); go('/');
+      save(K.vault,vault); save(K.recipes,recipes); save(K.body,body); save(K.tx,tx); save(K.budgets,budgets); save(K.todos,todos); save(K.reminders,reminders); save(K.habits,habits); save(K.smoke,smoke); save(K.settings,settings); toast('Restored 💜'); go('/');
     }catch(e){toast('That file didn’t look right 😕')}};
     r.readAsText(f);
   }
@@ -1413,10 +1474,10 @@
       '<div class="qa-grid" style="margin-bottom:6px">'+
         '<div class="qa" data-q="/todos"><span class="e b-lav">📝</span>To-Do</div>'+
         '<div class="qa" data-q="/reminders/new"><span class="e b-pink">🔔</span>Reminder</div>'+
+        '<div class="qa" data-q="/smoke"><span class="e b-mint">🌿</span>Smoke</div>'+
         '<div class="qa" data-q="/money/new"><span class="e b-yellow">💸</span>Expense</div>'+
-        '<div class="qa" data-q="/habits"><span class="e b-mint">🔥</span>Habit</div>'+
-        '<div class="qa" data-q="/recipes/new"><span class="e b-pink">🍳</span>Recipe</div>'+
-        '<div class="qa" data-q="/vault/new"><span class="e b-lav">🗝️</span>Vault</div>'+
+        '<div class="qa" data-q="/habits"><span class="e b-pink">🔥</span>Habit</div>'+
+        '<div class="qa" data-q="/recipes/new"><span class="e b-lav">🍳</span>Recipe</div>'+
       '</div>';
     $('#backdrop').classList.add('open'); s.classList.add('open');
     s.querySelectorAll('[data-q]').forEach(function(el){el.onclick=function(){closeSheet(); go(el.getAttribute('data-q'))}});
