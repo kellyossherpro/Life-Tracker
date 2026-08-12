@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Life Index">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A98BFF"/>
+      <stop offset="0.55" stop-color="#C9A6FF"/>
+      <stop offset="1" stop-color="#FF9ED8"/>
+    </linearGradient>
+    <radialGradient id="planet" cx="0.38" cy="0.32" r="0.8">
+      <stop offset="0" stop-color="#F1E4FF"/>
+      <stop offset="0.5" stop-color="#C0A0FF"/>
+      <stop offset="1" stop-color="#8560D8"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE7B0"/>
+      <stop offset="1" stop-color="#FFA6DE"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g fill="#ffffff">
+    <circle cx="86" cy="120" r="3.6" opacity="0.9"/>
+    <circle cx="430" cy="150" r="2.8" opacity="0.8"/>
+    <circle cx="150" cy="410" r="2.8" opacity="0.75"/>
+    <circle cx="410" cy="380" r="3.2" opacity="0.85"/>
+    <circle cx="250" cy="86" r="2.4" opacity="0.7"/>
+    <circle cx="70" cy="300" r="2.4" opacity="0.7"/>
+  </g>
+  <ellipse cx="256" cy="278" rx="176" ry="56" fill="none" stroke="url(#ring)" stroke-width="22" transform="rotate(-22 256 278)" opacity="0.5"/>
+  <circle cx="256" cy="256" r="118" fill="url(#planet)"/>
+  <ellipse cx="216" cy="216" rx="40" ry="26" fill="#ffffff" opacity="0.35"/>
+  <path d="M 96 310 A 176 56 -22 0 0 420 246" fill="none" stroke="url(#ring)" stroke-width="22" transform="rotate(-22 256 278)" stroke-linecap="round"/>
+  <g fill="#ffffff">
+    <path d="M372 140 l11 29 29 11 -29 11 -11 29 -11 -29 -29 -11 29 -11 z" opacity="0.97"/>
+    <path d="M150 195 l6.5 17 17 6.5 -17 6.5 -6.5 17 -6.5 -17 -17 -6.5 17 -6.5 z" opacity="0.85"/>
+  </g>
+</svg>
