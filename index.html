@@ -164,6 +164,7 @@
     cursor:pointer; background:var(--grad); color:#fff; box-shadow:var(--shadow-sm); transition:transform .12s ease}
   .btn:active{transform:scale(.98)}
   .btn.ghost{background:var(--card); color:var(--ink); border:1px solid var(--border); box-shadow:none}
+  .btn.ghost.on{background:var(--grad); color:#fff; border-color:transparent; box-shadow:var(--shadow-sm)}
   .btn.danger{background:transparent; color:var(--danger); border:1px solid var(--danger)}
   .btn.sm{width:auto; padding:10px 16px; font-size:13.5px; border-radius:13px}
 
@@ -631,7 +632,7 @@
   /* ---------- screens ---------- */
   function screenHome(){
     var items=[];
-    vault.forEach(function(e){ if(e.renewalDate){ var n=daysUntil(e.renewalDate); if(n!=null&&n>=0){ var c=CAT[e.category]||CAT.other;
+    vault.forEach(function(e){ if(e.renewalDate && !e.autoDebit){ var n=daysUntil(e.renewalDate); if(n!=null&&n>=0){ var c=CAT[e.category]||CAT.other;
       items.push({icon:c.icon,b:c.b,title:e.title,label:(e.category==='insurance'&&e.subtype)?e.subtype+' insurance':c.label,days:n}); } } });
     var np=nextPeriodInfo(); if(np&&np.days!=null&&np.days>=0&&np.days<=45) items.push({icon:'🌸',b:'b-pink',title:'Period',label:'Likely to start',days:np.days});
     reminders.forEach(function(r){ var nx=remNext(r); var n=daysUntil(nx); if(n!=null&&n>=0&&n<=45){ var ty=REM_TYPE[r.type]||REM_TYPE.reminder; items.push({icon:ty.icon,b:'b-pink',title:r.title,label:ty.label,days:n}); } });
@@ -694,7 +695,7 @@
             '<div class="bubble '+c.b+'">'+c.icon+'</div>'+
             '<div class="meta"><p class="t">'+esc(e.title)+(e.website?' <span style="font-size:12px">🔗</span>':'')+'</p><p class="p">'+esc(subline)+'</p></div>'+
             '<div class="right">'+(Number(e.monthlyCost)? '<div class="cost">'+money(e.monthlyCost)+'</div>':'')+
-              (n!=null&&n>=0?'<div class="due">'+(n<=7?'⏰ ':'')+whenText(n)+'</div>':'')+'</div>'+
+              (e.autoDebit? '<div class="due">💳 Auto</div>' : (n!=null&&n>=0?'<div class="due">'+(n<=7?'⏰ ':'')+whenText(n)+'</div>':''))+'</div>'+
           '</div>';
         }).join('')+'</div>');
 
@@ -739,6 +740,9 @@
       '<div class="section-label" style="margin-left:2px">💰 Cost &amp; dates</div>'+
       '<div class="row2"><div class="field"><label>Monthly cost ('+settings.currency+')</label><input name="monthlyCost" inputmode="decimal" placeholder="0" value="'+(e.monthlyCost||'')+'"></div>'+
       '<div class="field"><label>Next date due</label><input name="renewalDate" type="date" value="'+esc(e.renewalDate)+'"></div></div>'+
+      '<div class="field"><button type="button" class="btn ghost'+(e.autoDebit?' on':'')+'" id="v-auto-btn">💳 '+(e.autoDebit?'Pays automatically · on':'Pays automatically (debit order)')+'</button>'+
+        '<input type="hidden" name="autoDebit" id="v-auto-val" value="'+(e.autoDebit?'1':'')+'">'+
+        '<div class="locknote" style="margin:6px 2px 0">When on, this won’t nag you in reminders — it just quietly debits. All the details stay here in your Vault.</div></div>'+
       '<div class="field"><label>Notes</label><textarea name="notes" placeholder="Anything else to remember...">'+esc(e.notes)+'</textarea></div>'+
       '<div class="form-actions"><button class="btn" type="submit">'+(id?'💾 Save changes':'✨ Add to Vault')+'</button>'+
         (id?'<button class="btn danger" type="button" data-del="'+id+'">Delete entry</button>':'')+'</div>'+
@@ -1284,6 +1288,8 @@
         var isLogin=catSel.value==='logins'; var nl=$('#v-namelabel'), ni=$('#v-nameinput');
         if(nl) nl.textContent=isLogin?'Nickname':'Name'; if(ni) ni.placeholder=isLogin?'e.g. Personal Gmail':'e.g. Essential Med';
       };
+      var autoBtn=$('#v-auto-btn'), autoVal=$('#v-auto-val');
+      if(autoBtn&&autoVal) autoBtn.onclick=function(){ var on=autoVal.value!=='1'; autoVal.value=on?'1':''; autoBtn.classList.toggle('on',on); autoBtn.textContent='💳 '+(on?'Pays automatically · on':'Pays automatically (debit order)'); };
       var openSite=$('#open-site'); if(openSite) openSite.onclick=function(){
         var u=(form.querySelector('[name=website]').value||'').trim();
         if(!u){toast('Add a website first ✨');return;}
@@ -1296,6 +1302,7 @@
           title:(fd.get('title')||'').trim(),provider:(fd.get('provider')||'').trim(),
           contact:(fd.get('contact')||'').trim(),accountNo:(fd.get('accountNo')||'').trim(),idNumber:(fd.get('idNumber')||'').trim(),
           website:(fd.get('website')||'').trim(),username:(fd.get('username')||'').trim(),password:(fd.get('password')||''),
+          autoDebit:fd.get('autoDebit')==='1',
           monthlyCost:parseFloat(fd.get('monthlyCost'))||0,renewalDate:fd.get('renewalDate')||'',notes:(fd.get('notes')||'').trim()};
         if(!obj.title){toast('Give it a name first ✨');return}
         if(id){var i=vault.findIndex(function(x){return x.id===id}); if(i>-1) vault[i]=Object.assign({},vault[i],obj);}
