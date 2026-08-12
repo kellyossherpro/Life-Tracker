@@ -1,0 +1,514 @@
+<title>The Life Index</title>
+<style>
+  :root {
+    /* Light palette — warm-cool "personal ledger" */
+    --paper:        #f6f5f1;
+    --surface:      #fffdf9;
+    --surface-2:    #efede6;
+    --border:       #e2ded4;
+    --border-strong:#cfc9ba;
+    --ink:          #22252b;
+    --ink-soft:     #565b64;
+    --ink-faint:    #878c94;
+    --pine:         #0f5f57;   /* primary */
+    --pine-soft:    #e2efec;
+    --honey:        #c67d2a;   /* accent / signal */
+    --honey-soft:   #f7ecd9;
+    --berry:        #a83a5b;   /* health / cycle */
+    --good:         #2f8f5b;
+    --warn:         #c07d1f;
+    --shadow:       0 1px 2px rgba(34,37,43,.05), 0 8px 24px rgba(34,37,43,.06);
+    --shadow-card:  0 1px 2px rgba(34,37,43,.04), 0 2px 8px rgba(34,37,43,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:        #131518;
+      --surface:      #1b1e22;
+      --surface-2:    #22262b;
+      --border:       #2c3138;
+      --border-strong:#3a4048;
+      --ink:          #e9eaec;
+      --ink-soft:     #a4abb4;
+      --ink-faint:    #757c85;
+      --pine:         #4fbfae;
+      --pine-soft:    #16302c;
+      --honey:        #e0a259;
+      --honey-soft:   #2e2416;
+      --berry:        #e07a97;
+      --good:         #55c187;
+      --warn:         #e0a259;
+      --shadow:       0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-card:  0 1px 2px rgba(0,0,0,.25), 0 2px 8px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:        #131518;
+    --surface:      #1b1e22;
+    --surface-2:    #22262b;
+    --border:       #2c3138;
+    --border-strong:#3a4048;
+    --ink:          #e9eaec;
+    --ink-soft:     #a4abb4;
+    --ink-faint:    #757c85;
+    --pine:         #4fbfae;
+    --pine-soft:    #16302c;
+    --honey:        #e0a259;
+    --honey-soft:   #2e2416;
+    --berry:        #e07a97;
+    --good:         #55c187;
+    --warn:         #e0a259;
+    --shadow:       0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-card:  0 1px 2px rgba(0,0,0,.25), 0 2px 8px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+
+  /* Type */
+  h1, h2, h3 { line-height: 1.15; text-wrap: balance; letter-spacing: -0.02em; }
+  .display { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--pine); margin: 0 0 10px;
+  }
+  .eyebrow.honey { color: var(--honey); }
+  .eyebrow.berry { color: var(--berry); }
+  p { margin: 0 0 16px; }
+  a { color: var(--pine); }
+  strong { font-weight: 700; }
+  .lead { font-size: 19px; color: var(--ink-soft); }
+  .fine { font-size: 14px; color: var(--ink-soft); line-height: 1.55; }
+
+  /* Hero */
+  header.hero {
+    padding: 68px 0 40px;
+    border-bottom: 1px solid var(--border);
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--pine-soft) 0%, transparent 55%),
+      var(--paper);
+  }
+  .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--pine); background: var(--surface); border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 999px; box-shadow: var(--shadow-card);
+  }
+  .kicker .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pine); }
+  header.hero h1 {
+    font-size: clamp(38px, 9vw, 62px); font-weight: 800; margin: 22px 0 18px;
+  }
+  header.hero h1 .thin { color: var(--ink-soft); font-weight: 400; font-style: italic; }
+  .metarow {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px;
+  }
+  .chip {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 7px 12px; border-radius: 8px; box-shadow: var(--shadow-card);
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .chip b { color: var(--pine); font-weight: 700; }
+
+  /* Sections */
+  section { padding: 48px 0; border-bottom: 1px solid var(--border); }
+  section h2 { font-size: clamp(24px, 5.5vw, 32px); font-weight: 800; margin: 6px 0 14px; }
+  section > .wrap > p:last-child { margin-bottom: 0; }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; box-shadow: var(--shadow-card);
+  }
+  .grid { display: grid; gap: 14px; }
+  @media (min-width: 620px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+
+  /* Decisions list */
+  .decisions { display: grid; gap: 10px; }
+  .decision {
+    display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px 17px;
+    box-shadow: var(--shadow-card);
+  }
+  .decision .q { font-size: 12.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); font-weight: 700; margin: 0 0 3px; }
+  .decision .a { font-weight: 600; margin: 0; }
+  .decision .a .why { display: block; font-weight: 400; color: var(--ink-soft); font-size: 14.5px; margin-top: 3px; }
+  .tick {
+    width: 26px; height: 26px; border-radius: 7px; background: var(--pine-soft); color: var(--pine);
+    display: grid; place-items: center; font-weight: 800; font-size: 15px;
+  }
+
+  /* Architecture diagram */
+  .arch { display: grid; gap: 0; margin: 8px 0 4px; }
+  .arch-node {
+    background: var(--surface); border: 1px solid var(--border-strong); border-radius: 14px;
+    padding: 18px 20px; box-shadow: var(--shadow-card); position: relative;
+  }
+  .arch-node .lbl { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 6px; }
+  .arch-node .name { font-weight: 800; font-size: 18px; margin: 0 0 8px; }
+  .arch-node.phone .name { color: var(--pine); }
+  .arch-node.cloud .name { color: var(--honey); }
+  .arch-node ul { margin: 0; padding-left: 18px; }
+  .arch-node li { font-size: 14.5px; color: var(--ink-soft); margin: 2px 0; }
+  .arch-link {
+    justify-self: center; text-align: center; padding: 12px 16px; margin: 4px 0;
+    font-size: 13px; font-weight: 600; color: var(--pine);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .arch-link .bar { width: 2px; height: 16px; background: var(--border-strong); }
+  .arch-link .txt { background: var(--pine-soft); color: var(--pine); border-radius: 999px; padding: 5px 12px; }
+
+  /* Module table */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-card); }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 460px; background: var(--surface); }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-faint); font-weight: 700; background: var(--surface-2); }
+  tr:last-child td { border-bottom: none; }
+  td .m-name { font-weight: 700; color: var(--ink); }
+  .phase-tag {
+    display: inline-block; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .p1 { background: var(--pine-soft); color: var(--pine); }
+  .p2 { background: var(--honey-soft); color: var(--honey); }
+  .p3 { background: var(--surface-2); color: var(--ink-soft); }
+
+  /* Data model blocks */
+  .schema { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
+  .schema .field { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .schema .field:last-child { border-bottom: none; }
+  .schema .fname { color: var(--pine); font-weight: 600; min-width: 130px; }
+  .schema .ftype { color: var(--ink-faint); }
+  .schema .lock { color: var(--berry); font-weight: 700; font-family: -apple-system, sans-serif; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* Roadmap */
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 18px; padding: 4px 0 26px; position: relative; }
+  .phase:last-child { padding-bottom: 0; }
+  .phase-num {
+    width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+    font-weight: 800; font-size: 18px; color: var(--surface); background: var(--pine);
+    font-family: Georgia, serif;
+  }
+  .phase:nth-child(2) .phase-num { background: var(--honey); }
+  .phase:nth-child(3) .phase-num { background: var(--berry); }
+  .phase:nth-child(4) .phase-num { background: var(--ink-soft); }
+  .phase h3 { margin: 6px 0 6px; font-size: 19px; font-weight: 800; }
+  .phase .when { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); }
+
+  ul.clean { margin: 10px 0 0; padding-left: 20px; }
+  ul.clean li { margin: 5px 0; }
+
+  /* callout */
+  .callout {
+    border-left: 3px solid var(--honey); background: var(--honey-soft);
+    padding: 16px 18px; border-radius: 0 12px 12px 0; margin: 18px 0 0;
+  }
+  .callout.berry { border-color: var(--berry); background: color-mix(in srgb, var(--berry) 10%, var(--surface)); }
+  .callout.pine { border-color: var(--pine); background: var(--pine-soft); }
+  .callout p { margin: 0; font-size: 15px; }
+  .callout .h { font-weight: 800; display: block; margin-bottom: 4px; }
+
+  /* cost table small */
+  .cost td .num { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--good); }
+
+  footer.end { padding: 46px 0 70px; }
+  footer.end .cta {
+    background: var(--pine); color: #fff; border-radius: 16px; padding: 28px 24px; box-shadow: var(--shadow);
+  }
+  :root[data-theme="dark"] footer.end .cta { color: #0c1512; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) footer.end .cta { color: #0c1512; } }
+  footer.end .cta h2 { color: inherit; margin: 0 0 10px; font-size: 26px; }
+  footer.end .cta p { color: inherit; opacity: .92; margin: 0 0 6px; }
+  footer.end .cta .opts { margin-top: 16px; display: grid; gap: 8px; }
+  footer.end .cta .opt { background: rgba(255,255,255,.14); border-radius: 10px; padding: 12px 14px; font-size: 15px; }
+  :root[data-theme="dark"] footer.end .cta .opt { background: rgba(0,0,0,.16); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) footer.end .cta .opt { background: rgba(0,0,0,.16); } }
+
+  .num-list { counter-reset: step; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker"><span class="dot"></span>Blueprint · v1</span>
+    <h1 class="display">The Life Index <span class="thin">— everything, in one place</span></h1>
+    <p class="lead">A private, phone-first app that holds your whole life: your foods and recipes, your rent and car and medical aid, your money, your body — one tap from your home screen, and free to run.</p>
+    <div class="metarow">
+      <span class="chip">Built for <b>Kelly</b></span>
+      <span class="chip">Currency <b>Rand&nbsp;(R)</b></span>
+      <span class="chip"><b>Phone-first</b> PWA</span>
+      <span class="chip">Runs for <b>R0/mo</b></span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">What we decided together</p>
+    <h2>The five decisions, locked</h2>
+    <p class="lead" style="margin-bottom:22px;">You answered the big questions. Here's what they mean for how this gets built — every later choice flows from these.</p>
+    <div class="decisions">
+      <div class="decision">
+        <div class="tick">✓</div>
+        <div>
+          <p class="q">Where it lives</p>
+          <p class="a">A Progressive Web App on your phone
+            <span class="why">A website you "Add to Home Screen" so it opens like a real app, works offline, and needs no App Store. Also opens on any laptop.</span>
+          </p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="tick">✓</div>
+        <div>
+          <p class="q">Cost</p>
+          <p class="a">R0 / month, forever
+            <span class="why">Built entirely on free tiers. No subscription, no server bill. A cost breakdown is further down so you can see there's no catch.</span>
+          </p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="tick">✓</div>
+        <div>
+          <p class="q">Your data</p>
+          <p class="a">On your phone, auto-synced to a free private cloud
+            <span class="why">It saves instantly on your device, then quietly backs up so a lost phone never means lost data — and you can open it on a second device.</span>
+          </p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="tick">✓</div>
+        <div>
+          <p class="q">Where we start</p>
+          <p class="a">Foods &amp; Recipes + your Personal Info Vault
+            <span class="why">Your week-one modules. The rest — period, weight, spending, time — slot in afterwards without rebuilding anything.</span>
+          </p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="tick">✓</div>
+        <div>
+          <p class="q">Nudges</p>
+          <p class="a">Gentle reminders, on
+            <span class="why">Rent due, a policy renewal coming up, "log your weight." Handled by the phone's own notifications — details in the Reminders section.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow honey">How it actually works</p>
+    <h2>Three pieces, and only one of them costs a cent — zero cents</h2>
+    <p>Everything you do saves <strong>instantly on your phone</strong>, even with no signal. When you're online, a copy syncs to a free cloud so it's safely backed up. The sensitive stuff is <strong>locked before it ever leaves your phone</strong>.</p>
+
+    <div class="arch">
+      <div class="arch-node phone">
+        <p class="lbl">On your phone</p>
+        <p class="name">The app (PWA)</p>
+        <ul>
+          <li>Opens from your home screen, works offline</li>
+          <li>Saves to your phone's own storage first — instant, no waiting</li>
+          <li>Locks vault fields (ID, policy numbers) with a passphrase only you know</li>
+        </ul>
+      </div>
+      <div class="arch-link">
+        <span class="bar"></span>
+        <span class="txt">encrypted sync ↕ when online</span>
+        <span class="bar"></span>
+      </div>
+      <div class="arch-node cloud">
+        <p class="lbl">Free private cloud</p>
+        <p class="name">Backup &amp; sync</p>
+        <ul>
+          <li>Your own account, guarded by your login</li>
+          <li>Restores everything onto a new phone in seconds</li>
+          <li>Can't read your locked fields — they arrive already scrambled</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout pine">
+      <p><span class="h">The plain-English version</span>Think of your phone as the notebook you write in, and the cloud as a photocopy kept in a safe. You always work in the notebook; the safe just means you never lose it — and the private pages are in a code even the safe's owner can't crack.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">The full map</p>
+    <h2>Every part of your life, and when it arrives</h2>
+    <p>You wanted to track <em>absolutely everything</em> — so here's everything, grouped into modules. Nothing is dropped; it's sequenced. We build the two you chose first, then add a module at a time.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Module</th><th>What it holds</th><th>Phase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="m-name">Foods &amp; Recipes</span></td><td>Favorite foods, recipes, ingredients, prep &amp; cook time, cost per meal, favorite shops</td><td><span class="phase-tag p1">Phase 1</span></td></tr>
+          <tr><td><span class="m-name">Personal Info Vault</span></td><td>Medical aid, insurance, internet, rent, car, ID &amp; documents — all your reference details</td><td><span class="phase-tag p1">Phase 1</span></td></tr>
+          <tr><td><span class="m-name">Period &amp; Cycle</span></td><td>Log periods &amp; symptoms, see your cycle, predict the next one</td><td><span class="phase-tag p2">Phase 2</span></td></tr>
+          <tr><td><span class="m-name">Weight &amp; Body</span></td><td>Weight over time, trend charts, notes</td><td><span class="phase-tag p2">Phase 2</span></td></tr>
+          <tr><td><span class="m-name">Spending &amp; Money</span></td><td>Upload bank statements, auto-sort spending, spot where you overspent vs a budget</td><td><span class="phase-tag p3">Phase 3</span></td></tr>
+          <tr><td><span class="m-name">Time &amp; Habits</span></td><td>How you spend your time, routines, habits</td><td><span class="phase-tag p3">Phase 3</span></td></tr>
+          <tr><td><span class="m-name">Home Dashboard</span></td><td>One screen: what's due, latest weight, this week's spend, quick-add anything</td><td><span class="phase-tag p3">Phase 3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fine" style="margin-top:14px;">Favorite shops start life inside Foods &amp; Recipes (where they're most useful — "where do I buy this, and what does it cost there?") and can graduate into their own screen later if you want.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Week one, in detail</p>
+    <h2>Module 1 — Foods &amp; Recipes</h2>
+    <p>A living cookbook of <em>your</em> foods. Every recipe knows its ingredients, and every ingredient knows what it costs and where you buy it — so the app can tell you the <strong>total cost of a meal</strong> and how long it takes, automatically.</p>
+    <div class="card schema" style="margin-top:6px;">
+      <div class="field"><span class="fname">name</span><span class="ftype">text — e.g. "Chicken curry"</span></div>
+      <div class="field"><span class="fname">photo</span><span class="ftype">image (optional)</span></div>
+      <div class="field"><span class="fname">favourite</span><span class="ftype">yes / no — powers your "favorites" view</span></div>
+      <div class="field"><span class="fname">ingredients[]</span><span class="ftype">each: name · quantity · unit · cost (R) · shop</span></div>
+      <div class="field"><span class="fname">prep_time</span><span class="ftype">minutes</span></div>
+      <div class="field"><span class="fname">cook_time</span><span class="ftype">minutes</span></div>
+      <div class="field"><span class="fname">servings</span><span class="ftype">number</span></div>
+      <div class="field"><span class="fname">total_cost</span><span class="ftype">auto-added from ingredients → also shown per serving</span></div>
+      <div class="field"><span class="fname">steps</span><span class="ftype">the method / recipe</span></div>
+      <div class="field"><span class="fname">rating · last_made</span><span class="ftype">stars, and when you last cooked it</span></div>
+    </div>
+    <div class="callout">
+      <p><span class="h">Why this shape</span>Because you asked for the recipe, the ingredients, the time <em>and</em> the cost — so cost and time aren't things you type in, they're worked out from the ingredients you list. Change a price once and every meal that uses it updates.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow berry">Week one, in detail</p>
+    <h2>Module 2 — Personal Info Vault</h2>
+    <p>Every "where's that detail again?" answered in one place: medical aid, insurance, internet, rent, car, ID numbers, account numbers. Because some of this is genuinely sensitive, the vault has an extra rule — the private fields are <strong>encrypted on your phone</strong> before syncing, so no server ever sees them in the clear.</p>
+    <div class="card schema" style="margin-top:6px;">
+      <div class="field"><span class="fname">category</span><span class="ftype">Medical Aid · Insurance · Internet · Rent · Car · ID &amp; Docs · Utilities · Subscriptions</span></div>
+      <div class="field"><span class="fname">title</span><span class="ftype">text — e.g. "Discovery Health"</span></div>
+      <div class="field"><span class="fname">provider</span><span class="ftype">company &amp; contact number</span></div>
+      <div class="field"><span class="fname">account_no</span><span class="ftype">policy / member / account number <span class="lock">🔒 locked</span></span></div>
+      <div class="field"><span class="fname">id_number</span><span class="ftype">for ID &amp; documents <span class="lock">🔒 locked</span></span></div>
+      <div class="field"><span class="fname">monthly_cost</span><span class="ftype">R — feeds your money view later</span></div>
+      <div class="field"><span class="fname">renewal_date</span><span class="ftype">date — becomes a reminder</span></div>
+      <div class="field"><span class="fname">documents</span><span class="ftype">photos of cards / policies (optional)</span></div>
+      <div class="field"><span class="fname">notes</span><span class="ftype">anything else</span></div>
+    </div>
+    <div class="callout berry">
+      <p><span class="h">On safety</span>Fields marked <strong>🔒 locked</strong> are scrambled with a passphrase only you know (built on your phone's own encryption). Even if someone got into the cloud account, those fields would be unreadable. The trade-off: forget the passphrase and those fields can't be recovered — so we'll set that up carefully, together.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow honey">The build order</p>
+    <h2>How we get there, phase by phase</h2>
+    <p style="margin-bottom:26px;">Each phase ends with something real you can use on your phone — never a half-finished screen. You try it, tell me what's wrong, and we move on.</p>
+
+    <div class="phase">
+      <div class="phase-num">0</div>
+      <div>
+        <span class="when">The foundation</span>
+        <h3>The shell that everything plugs into</h3>
+        <p>The installable app itself: home screen, navigation, offline storage, your login, and the encrypted sync. No features yet — just the frame, working on your phone.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">1</div>
+      <div>
+        <span class="when">Your week-one choices</span>
+        <h3>Foods &amp; Recipes + Personal Info Vault</h3>
+        <ul class="clean">
+          <li>Add foods with ingredients, time, and auto-calculated cost</li>
+          <li>Favorites view and favorite-shops list</li>
+          <li>The vault, with locked fields for the sensitive bits</li>
+          <li>First reminders: policy renewals &amp; rent due</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">2</div>
+      <div>
+        <span class="when">Your body</span>
+        <h3>Period &amp; Cycle + Weight</h3>
+        <ul class="clean">
+          <li>Log periods and symptoms; predict the next cycle</li>
+          <li>Weight over time with a simple trend chart</li>
+          <li>"Period likely soon" and weigh-in reminders</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">3</div>
+      <div>
+        <span class="when">Money &amp; time</span>
+        <h3>Spending, Time, and the Home Dashboard</h3>
+        <ul class="clean">
+          <li>Upload bank statements (CSV first, PDF after) → auto-sorted spending</li>
+          <li>Budgets and "you overspent here" flags</li>
+          <li>Time &amp; habits tracking</li>
+          <li>A home screen that pulls it all together at a glance</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Nudges</p>
+    <h2>How reminders reach you</h2>
+    <p>Reminders come from <strong>due dates you've already entered</strong> — a rent day, a renewal, an expected period, a weigh-in you've skipped. The app schedules them through your phone's own notification system, so they arrive even when the app is closed.</p>
+    <div class="callout">
+      <p><span class="h">One honest limitation</span>On iPhone, web-app notifications only work once the app is <strong>added to your home screen</strong> (iOS 16.4+) — which you're doing anyway. On Android they just work. Either way, this is the free path; a paid App Store version would only be needed if that ever felt too limited.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow honey">The receipts</p>
+    <h2>What "free" really costs</h2>
+    <p>Every piece runs inside a free tier that's far larger than one person's data will ever fill. No card required to start.</p>
+    <div class="tablewrap">
+      <table class="cost">
+        <thead><tr><th>Piece</th><th>What it does</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td><span class="m-name">The app hosting</span></td><td>Serves the website you install</td><td><span class="num">R0</span></td></tr>
+          <tr><td><span class="m-name">Cloud backup &amp; login</span></td><td>Free-tier database + accounts, well beyond one person's needs</td><td><span class="num">R0</span></td></tr>
+          <tr><td><span class="m-name">On-phone storage</span></td><td>Your device's own space — instant &amp; offline</td><td><span class="num">R0</span></td></tr>
+          <tr><td><span class="m-name">Encryption</span></td><td>Built into your phone's browser already</td><td><span class="num">R0</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fine" style="margin-top:14px;">The only ever-optional spend: a custom web address (like <em>lifeindex.me</em>) for ~R150/year instead of a free auto-generated one. Purely cosmetic — skip it.</p>
+  </div>
+</section>
+
+<footer class="end">
+  <div class="wrap">
+    <div class="cta">
+      <h2 class="display">So — where do we point the shovel?</h2>
+      <p>The plan's ready. The natural next move is to build <strong>Phase 0 + Phase 1</strong>: a real app you can add to your home screen, with Foods &amp; Recipes and your Vault working. But it's your call.</p>
+      <div class="opts">
+        <div class="opt"><strong>A.</strong> Build it — start with the app shell + your two week-one modules.</div>
+        <div class="opt"><strong>B.</strong> Tweak the plan first — reorder modules, add something I missed, change a data field.</div>
+        <div class="opt"><strong>C.</strong> Go even smaller — one single screen (say, Foods) to feel it on your phone before anything else.</div>
+      </div>
+      <p style="margin-top:16px; font-size:14px;">Tell me A, B, or C — and anything you'd change.</p>
+    </div>
+  </div>
+</footer>
