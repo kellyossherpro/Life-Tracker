@@ -1234,11 +1234,15 @@
   }
   function commitImported(items){
     if(!items||!items.length){ toast('No transactions found in that file 😕'); return; }
-    items.forEach(function(t){ tx.push(t); });
+    var key=function(t){return t.date+'|'+t.amount+'|'+t.type+'|'+(t.desc||'').slice(0,8).toLowerCase();};
+    var seen={}; tx.forEach(function(t){ seen[key(t)]=true; });
+    var added=[];
+    items.forEach(function(t){ var k=key(t); if(!seen[k]){ seen[k]=true; tx.push(t); added.push(t); } });
+    if(!added.length){ toast('Already imported — nothing new ✨'); return; }
     save(K.tx,tx);
-    var last=items[items.length-1].date; if(last) spendMonth=monthKey(last);
-    var inc=items.filter(function(t){return t.type==='income'}).length;
-    toast('Imported '+items.length+' item'+(items.length>1?'s':'')+(inc?' ('+inc+' income)':'')+' ✨'); render();
+    var last=added[added.length-1].date; if(last) spendMonth=monthKey(last);
+    var inc=added.filter(function(t){return t.type==='income'}).length;
+    toast('Added '+added.length+' new'+(added.length>1?' items':' item')+(inc?' ('+inc+' income)':'')+' ✨'); render();
   }
 
   /* ---------- To-Do ---------- */
