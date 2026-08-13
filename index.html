@@ -503,6 +503,7 @@
   var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', smoke:'lifeindex.smoke', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  var APP_VERSION='v9 · 13 Aug';
   var settings=load(K.settings,{name:'Kelly', currency:'R', salaryKeywords:['kiron']});
   var vault=load(K.vault,[]);
   var recipes=load(K.recipes,[]);
@@ -807,7 +808,7 @@
       '<div class="snap-row" data-nav-go="/habits" style="cursor:pointer"><div class="bubble b-mint">🔥</div><div class="txt"><div class="big">Habits</div><div class="lead">Daily streaks</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/smoke" style="cursor:pointer"><div class="bubble b-mint">🌿</div><div class="txt"><div class="big">Smoke Log</div><div class="lead">Joints · pens · bongs</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
     '</div></div>'+
-    '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index — made with 💜 for '+esc(settings.name)+'</div>';
+    '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index '+APP_VERSION+' — made with 💜 for '+esc(settings.name)+'</div>';
   }
 
   /* ---------- recipes screens ---------- */
@@ -1052,7 +1053,7 @@
       over.map(function(c){return '<div style="font-size:13px;color:var(--ink-soft)">'+SPEND_CATS[c].icon+' '+SPEND_CATS[c].label+' — '+money(totals[c])+' of '+money(budgets[c])+' <b style="color:var(--danger)">('+money(totals[c]-budgets[c])+' over)</b></div>';}).join('')+'</div>' : '';
 
     var recent=monthTx.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')}).slice(0,40);
-    var txList='<div class="section-label">🧾 Transactions</div><div class="card">'+recent.map(function(t){var c=SPEND_CATS[t.category]||SPEND_CATS.other;
+    var txList='<div class="section-label">🧾 Transactions<button class="lock-link" id="clr-month" style="margin-left:auto;color:var(--ink-faint);font-size:12px;text-decoration:none">Clear month</button></div><div class="card">'+recent.map(function(t){var c=SPEND_CATS[t.category]||SPEND_CATS.other;
       var isInc=t.type==='income', isTr=t.type==='transfer';
       var icon=isInc?'💰':isTr?'🔁':c.icon; var bg=isInc?'#5BD1A622':isTr?'#C9B8F022':c.color+'22';
       var label=isInc?'Income':isTr?'Transfer':c.label;
@@ -1127,8 +1128,8 @@
     for(var i=start;i<rows.length;i++){var r=rows[i]; if(!r)continue;
       var desc=((ei>-1&&r[ei])||'').trim(); var amt=0,type='expense';
       if(debi>-1||credi>-1){var deb=parseAmt(debi>-1?r[debi]:''),cre=parseAmt(credi>-1?r[credi]:'');
-        if(deb){amt=Math.abs(deb);type='expense';} else if(cre){amt=Math.abs(cre);type=classifyCredit(desc);} }
-      else{var v=parseAmt(ai>-1?r[ai]:''); if(v==null)continue; if(v<0){amt=Math.abs(v);type='expense';}else{amt=v;type=classifyCredit(desc);}}
+        if(deb){amt=Math.abs(deb);type=classifyTxn(desc,false);} else if(cre){amt=Math.abs(cre);type=classifyTxn(desc,true);} }
+      else{var v=parseAmt(ai>-1?r[ai]:''); if(v==null)continue; if(v<0){amt=Math.abs(v);type=classifyTxn(desc,false);}else{amt=v;type=classifyTxn(desc,true);}}
       if(!amt) continue;
       var date=parseDate(di>-1?r[di]:''); var en=enrich(desc);
       out.push({id:uid(),date:date,desc:(en?en.name:desc)||'Transaction',amount:amt,type:type,category:en?en.cat:categorize(desc),website:en?en.web:''});
@@ -1178,9 +1179,15 @@
     for(var i=0;i<MERCHANTS.length;i++){var m=MERCHANTS[i]; for(var j=0;j<m.k.length;j++){ if(d.indexOf(m.k[j])>-1) return m; }}
     return null;
   }
-  // credits: money that matches your employer(s) = real income; everything else = a transfer (your own money moving)
+  // credits matching your employer(s) = real income; other credits AND your own money moving out = transfers
   function salaryWords(){ var w=(settings.salaryKeywords&&settings.salaryKeywords.length)?settings.salaryKeywords:['kiron']; return w.map(function(s){return String(s).toLowerCase().trim();}).filter(Boolean); }
-  function classifyCredit(desc){ var d=(desc||'').toLowerCase(); var ws=salaryWords(); for(var i=0;i<ws.length;i++){ if(ws[i]&&d.indexOf(ws[i])>-1) return 'income'; } return 'transfer'; }
+  function classifyTxn(desc, isCredit){
+    var d=(desc||'').toLowerCase(); var name=(settings.name||'').toLowerCase().trim();
+    if(isCredit){ return salaryWords().some(function(w){return w&&d.indexOf(w)>-1;}) ? 'income' : 'transfer'; }
+    var isTransfer = /\btransfer\b|\btrf\b|schedule trf|scheduled payment|to invest|rent dep/.test(d)
+      || (name && name.length>2 && d.indexOf(name)>-1 && /(payment to|transfer|trf|payshap|scheduled)/.test(d));
+    return isTransfer ? 'transfer' : 'expense';
+  }
   function cleanDesc(desc){ return (desc||'')
     .replace(/\d{6}\*\d{4}\s*\d{0,2}\s*[A-Za-z]{0,3}/g,'')
     .replace(/^POS Purchase\s*/i,'').replace(/^FNB App\s*/i,'').replace(/#Int Pymt Fee-?/ig,'')
@@ -1224,7 +1231,7 @@
           var firstIdx=line.indexOf(monies[0]);
           var descRaw=line.slice(dm[0].length, firstIdx).replace(/\d{6}\*\d{4}\s*\d{0,2}\s*[A-Za-z]{0,3}/g,'').replace(/^\s*20\d{2}\s*/,'').replace(/\s{2,}/g,' ').trim();
           var date=year+'-'+String(mon).padStart(2,'0')+'-'+String(+dm[1]).padStart(2,'0');
-          var en=enrich(descRaw); var type=isCr?classifyCredit(descRaw):'expense';
+          var en=enrich(descRaw); var type=classifyTxn(descRaw, isCr);
           out.push({id:uid(),date:date,desc:(en?en.name:cleanDesc(descRaw))||'Transaction',amount:amt,
             type:type,category:en?en.cat:categorize(descRaw),website:en?en.web:''});
         });
@@ -1525,6 +1532,7 @@
       csvFile.value=''; }; }
     document.querySelectorAll('[data-txopen]').forEach(function(el){el.onclick=function(){go('/money/edit/'+el.getAttribute('data-txopen'))}});
     document.querySelectorAll('[data-txweb]').forEach(function(el){el.onclick=function(ev){ev.stopPropagation(); var u=el.getAttribute('data-txweb'); if(!/^https?:\/\//i.test(u))u='https://'+u; window.open(u,'_blank','noopener');};});
+    var cm=$('#clr-month'); if(cm) cm.onclick=function(){ if(confirm('Clear all transactions for '+monthLabel(spendMonth)+'? You can re-import your statement afterwards.')){ tx=tx.filter(function(t){return monthKey(t.date)!==spendMonth;}); save(K.tx,tx); toast('Cleared '+monthLabel(spendMonth)); render(); } };
 
     var txform=$('#txform'); if(txform){
       var descEl=$('#tx-desc'), catEl=$('#tx-cat'), catTouched=false;
