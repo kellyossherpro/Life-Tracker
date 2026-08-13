@@ -330,6 +330,7 @@
   .tx-row .tc{font-size:12px; color:var(--ink-soft)}
   .tx-row .ta{font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap}
   .tx-row .ta.inc{color:var(--good)}
+  .tx-row .ta.tr{color:var(--ink-faint); font-weight:600}
   .txlink{font-size:11px; cursor:pointer; opacity:.75}
   .bud-row{padding:12px 2px}
   .bud-row + .bud-row{border-top:1px solid var(--border-2)}
@@ -502,7 +503,7 @@
   var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', smoke:'lifeindex.smoke', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-  var settings=load(K.settings,{name:'Kelly', currency:'R'});
+  var settings=load(K.settings,{name:'Kelly', currency:'R', salaryKeywords:['kiron']});
   var vault=load(K.vault,[]);
   var recipes=load(K.recipes,[]);
   var body=load(K.body,{weights:[],periods:[],moods:[]});
@@ -652,7 +653,7 @@
     items.sort(function(a,b){return a.days-b.days}); items=items.slice(0,5);
     var monthly=vault.reduce(function(s,e){return s+(Number(e.monthlyCost)||0)},0);
     var thisMonthKey=(function(){var n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
-    var spentThisMonth=tx.filter(function(t){return (t.date||'').slice(0,7)===thisMonthKey && t.type!=='income'}).reduce(function(s,t){return s+(Number(t.amount)||0)},0);
+    var spentThisMonth=tx.filter(function(t){return (t.date||'').slice(0,7)===thisMonthKey && t.type==='expense'}).reduce(function(s,t){return s+(Number(t.amount)||0)},0);
 
     var snap = items.length ? items.map(function(x){
       return '<div class="snap-row"><div class="bubble '+x.b+'">'+x.icon+'</div>'+
@@ -785,6 +786,10 @@
         : '<button class="btn" id="s-setpin">🔒 Set up a PIN lock</button>')+
       '<div class="locknote" style="margin:2px 2px 0">A lock keeps the app private from anyone who picks up your phone. Your data always stays on this device — never uploaded. If you forget the PIN you can reset (this clears data), so keep an export backup.</div>'+
     '</div>'+
+    '<div class="section-label">💼 Salary</div>'+
+    '<div class="card tight"><div class="field" style="margin:0"><label>Money coming in counts as income when the description contains…</label>'+
+      '<input id="s-salary" placeholder="Kiron" value="'+esc((settings.salaryKeywords||['kiron']).join(', '))+'"></div>'+
+      '<div class="locknote" style="margin:8px 2px 0">Anything else that comes in (credit-card moves, deposits paid back) is treated as a Transfer — shown, but not counted as income. Separate multiple with commas.</div></div>'+
     '<div class="section-label">Your data</div>'+
     '<div class="card tight" style="display:flex;flex-direction:column;gap:10px">'+
       '<button class="btn ghost" id="s-export">⬇️ Export a backup file</button>'+
@@ -1007,12 +1012,12 @@
   function monthKey(iso){return (iso||'').slice(0,7);}
   function monthLabel(key){var p=key.split('-'); var d=new Date(+p[0],+p[1]-1,1); return d.toLocaleDateString('en-ZA',{month:'long',year:'numeric'});}
   function shiftMonth(key,delta){var p=key.split('-'); var d=new Date(+p[0],+p[1]-1+delta,1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
-  function monthExpenses(key){return tx.filter(function(t){return monthKey(t.date)===key && t.type!=='income'});}
+  function monthExpenses(key){return tx.filter(function(t){return monthKey(t.date)===key && t.type==='expense'});}
   var spendMonth=(function(){var n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
 
   function screenSpending(){
     var monthTx=tx.filter(function(t){return monthKey(t.date)===spendMonth});
-    var expenses=monthTx.filter(function(t){return t.type!=='income'});
+    var expenses=monthTx.filter(function(t){return t.type==='expense'});
     var totalSpent=expenses.reduce(function(s,t){return s+(Number(t.amount)||0)},0);
     var prevTotal=monthExpenses(shiftMonth(spendMonth,-1)).reduce(function(s,t){return s+(+t.amount||0)},0);
     var deltaPct=prevTotal? Math.round((totalSpent-prevTotal)/prevTotal*100):0;
@@ -1047,10 +1052,14 @@
       over.map(function(c){return '<div style="font-size:13px;color:var(--ink-soft)">'+SPEND_CATS[c].icon+' '+SPEND_CATS[c].label+' — '+money(totals[c])+' of '+money(budgets[c])+' <b style="color:var(--danger)">('+money(totals[c]-budgets[c])+' over)</b></div>';}).join('')+'</div>' : '';
 
     var recent=monthTx.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')}).slice(0,40);
-    var txList='<div class="section-label">🧾 Transactions</div><div class="card">'+recent.map(function(t){var c=SPEND_CATS[t.category]||SPEND_CATS.other; var inc=t.type==='income';
-      return '<div class="tx-row" data-txopen="'+t.id+'"><div class="bubble" style="width:40px;height:40px;font-size:17px;background:'+c.color+'22">'+c.icon+'</div>'+
-        '<div class="meta"><div class="td">'+esc(t.desc||c.label)+(t.website?' <span class="txlink" data-txweb="'+esc(t.website)+'">🔗</span>':'')+'</div><div class="tc">'+c.label+' · '+fmtDate(t.date)+'</div></div>'+
-        '<div class="ta '+(inc?'inc':'')+'">'+(inc?'+':'−')+money(t.amount).replace(settings.currency+' ',settings.currency)+'</div></div>';}).join('')+'</div>';
+    var txList='<div class="section-label">🧾 Transactions</div><div class="card">'+recent.map(function(t){var c=SPEND_CATS[t.category]||SPEND_CATS.other;
+      var isInc=t.type==='income', isTr=t.type==='transfer';
+      var icon=isInc?'💰':isTr?'🔁':c.icon; var bg=isInc?'#5BD1A622':isTr?'#C9B8F022':c.color+'22';
+      var label=isInc?'Income':isTr?'Transfer':c.label;
+      var sign=isInc?'+':isTr?'':'−'; var acls=isInc?'inc':isTr?'tr':'';
+      return '<div class="tx-row" data-txopen="'+t.id+'"><div class="bubble" style="width:40px;height:40px;font-size:17px;background:'+bg+'">'+icon+'</div>'+
+        '<div class="meta"><div class="td">'+esc(t.desc||c.label)+(t.website?' <span class="txlink" data-txweb="'+esc(t.website)+'">🔗</span>':'')+'</div><div class="tc">'+label+' · '+fmtDate(t.date)+'</div></div>'+
+        '<div class="ta '+acls+'">'+sign+money(t.amount).replace(settings.currency+' ',settings.currency)+'</div></div>';}).join('')+'</div>';
 
     return '<div class="screen-head" style="margin-bottom:8px"><div><h2 class="title">Spending 💸</h2><div class="sub">Where your money goes.</div></div></div>'+monthNav+donut+actions+flags+txList;
   }
@@ -1063,7 +1072,7 @@
     '<div class="screen-head"><div><h2 class="title">'+(id?'Edit transaction':'New transaction')+'</h2></div>'+
       '<button class="iconbtn" data-nav-go="/money">✕</button></div>'+
     '<form id="txform">'+
-      '<div class="row2"><div class="field"><label>Type</label><select name="type"><option value="expense" '+(t.type!=='income'?'selected':'')+'>Spent</option><option value="income" '+(t.type==='income'?'selected':'')+'>Received</option></select></div>'+
+      '<div class="row2"><div class="field"><label>Type</label><select name="type"><option value="expense" '+(t.type==='expense'||!t.type?'selected':'')+'>Spent</option><option value="income" '+(t.type==='income'?'selected':'')+'>Income (salary)</option><option value="transfer" '+(t.type==='transfer'?'selected':'')+'>Transfer (own money)</option></select></div>'+
       '<div class="field"><label>Amount ('+settings.currency+')</label><input name="amount" inputmode="decimal" placeholder="0.00" value="'+(t.amount||'')+'" required></div></div>'+
       '<div class="field"><label>Merchant / description</label><input name="desc" id="tx-desc" placeholder="e.g. Checkers" value="'+esc(t.desc)+'"></div>'+
       '<div class="field"><label>Category</label><select name="category" id="tx-cat">'+catOpts+'</select></div>'+
@@ -1118,8 +1127,8 @@
     for(var i=start;i<rows.length;i++){var r=rows[i]; if(!r)continue;
       var desc=((ei>-1&&r[ei])||'').trim(); var amt=0,type='expense';
       if(debi>-1||credi>-1){var deb=parseAmt(debi>-1?r[debi]:''),cre=parseAmt(credi>-1?r[credi]:'');
-        if(deb){amt=Math.abs(deb);type='expense';} else if(cre){amt=Math.abs(cre);type='income';} }
-      else{var v=parseAmt(ai>-1?r[ai]:''); if(v==null)continue; if(v<0){amt=Math.abs(v);type='expense';}else{amt=v;type='income';}}
+        if(deb){amt=Math.abs(deb);type='expense';} else if(cre){amt=Math.abs(cre);type=classifyCredit(desc);} }
+      else{var v=parseAmt(ai>-1?r[ai]:''); if(v==null)continue; if(v<0){amt=Math.abs(v);type='expense';}else{amt=v;type=classifyCredit(desc);}}
       if(!amt) continue;
       var date=parseDate(di>-1?r[di]:''); var en=enrich(desc);
       out.push({id:uid(),date:date,desc:(en?en.name:desc)||'Transaction',amount:amt,type:type,category:en?en.cat:categorize(desc),website:en?en.web:''});
@@ -1169,6 +1178,9 @@
     for(var i=0;i<MERCHANTS.length;i++){var m=MERCHANTS[i]; for(var j=0;j<m.k.length;j++){ if(d.indexOf(m.k[j])>-1) return m; }}
     return null;
   }
+  // credits: money that matches your employer(s) = real income; everything else = a transfer (your own money moving)
+  function salaryWords(){ var w=(settings.salaryKeywords&&settings.salaryKeywords.length)?settings.salaryKeywords:['kiron']; return w.map(function(s){return String(s).toLowerCase().trim();}).filter(Boolean); }
+  function classifyCredit(desc){ var d=(desc||'').toLowerCase(); var ws=salaryWords(); for(var i=0;i<ws.length;i++){ if(ws[i]&&d.indexOf(ws[i])>-1) return 'income'; } return 'transfer'; }
   function cleanDesc(desc){ return (desc||'')
     .replace(/\d{6}\*\d{4}\s*\d{0,2}\s*[A-Za-z]{0,3}/g,'')
     .replace(/^POS Purchase\s*/i,'').replace(/^FNB App\s*/i,'').replace(/#Int Pymt Fee-?/ig,'')
@@ -1202,9 +1214,9 @@
           var mon=MON[m[2].toLowerCase()]; if(!mon) return;
           var amtTok=m[4]; var isCr=/Cr$/.test(amtTok); var amt=parseFloat(amtTok.replace(/[^0-9.]/g,'')); if(!amt) return;
           var date=year+'-'+String(mon).padStart(2,'0')+'-'+String(+m[1]).padStart(2,'0');
-          var descRaw=m[3]; var en=enrich(descRaw);
+          var descRaw=m[3]; var en=enrich(descRaw); var type=isCr?classifyCredit(descRaw):'expense';
           out.push({id:uid(),date:date,desc:(en?en.name:cleanDesc(descRaw))||'Transaction',amount:amt,
-            type:isCr?'income':'expense',category:en?en.cat:categorize(descRaw),website:en?en.web:''});
+            type:type,category:en?en.cat:categorize(descRaw),website:en?en.web:''});
         });
         return out;
       });
@@ -1556,6 +1568,7 @@
 
     // More screen
     var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
+    var sSal=$('#s-salary'); if(sSal) sSal.onchange=function(){ settings.salaryKeywords=sSal.value.split(',').map(function(s){return s.trim();}).filter(Boolean); save(K.settings,settings); toast('Saved 💜'); };
     var avBtn=$('#s-avatar-btn'), avFile=$('#s-avatar-file');
     if(avBtn&&avFile){ avBtn.onclick=function(){avFile.click()}; avFile.onchange=function(){var f=avFile.files[0]; if(!f)return; if(f.size>3.5*1024*1024){toast('Try a smaller image (under ~3MB) 💜');return;} var rd=new FileReader(); rd.onload=function(){settings.avatar=rd.result; save(K.settings,settings); toast('Looking lovely 💜'); render();}; rd.readAsDataURL(f);}; }
     var avRm=$('#s-avatar-rm'); if(avRm) avRm.onclick=function(){delete settings.avatar; save(K.settings,settings); toast('Photo removed'); render();};
