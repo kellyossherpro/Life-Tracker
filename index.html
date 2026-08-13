@@ -330,6 +330,7 @@
   .tx-row .tc{font-size:12px; color:var(--ink-soft)}
   .tx-row .ta{font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap}
   .tx-row .ta.inc{color:var(--good)}
+  .txlink{font-size:11px; cursor:pointer; opacity:.75}
   .bud-row{padding:12px 2px}
   .bud-row + .bud-row{border-top:1px solid var(--border-2)}
   .bud-head{display:flex; align-items:center; gap:10px; margin-bottom:8px}
@@ -522,6 +523,7 @@
     entertainment:{label:'Entertainment',icon:'🎬',color:'#5BD1A6'},
     bills:{label:'Bills',icon:'💡',color:'#F2C94C'},
     health:{label:'Health',icon:'💊',color:'#8FD3FF'},
+    subscriptions:{label:'Subscriptions',icon:'📱',color:'#B388EB'},
     other:{label:'Other',icon:'📦',color:'#C9B8F0'}
   };
   var CAT_KEYWORDS={
@@ -1016,10 +1018,11 @@
     var deltaPct=prevTotal? Math.round((totalSpent-prevTotal)/prevTotal*100):0;
     var monthNav='<div class="month-nav"><button data-mshift="-1">‹</button><div class="mlbl">'+monthLabel(spendMonth)+'</div><button data-mshift="1">›</button></div>';
 
+    var income=monthTx.filter(function(t){return t.type==='income'}).reduce(function(s,t){return s+(Number(t.amount)||0)},0);
     if(monthTx.length===0){
-      return monthNav+'<div class="empty"><div class="em">💸</div><h3>Nothing here yet</h3><p>Import a bank statement (CSV) or add a transaction to see where your money goes.</p>'+
+      return monthNav+'<div class="empty"><div class="em">💸</div><h3>Nothing here yet</h3><p>Import your bank statement (PDF or CSV) or add a transaction to see where your money goes.</p>'+
         '<div class="center-x" style="margin-top:16px;gap:10px;display:flex;flex-wrap:wrap"><button class="btn sm" data-nav-go="/money/new">✨ Add transaction</button>'+
-        '<button class="btn ghost sm" id="imp-btn">⬆️ Import CSV</button></div><input type="file" id="csv-file" accept=".csv,text/csv" class="hidden"></div>';
+        '<button class="btn ghost sm" id="imp-btn">⬆️ Import statement</button></div><input type="file" id="csv-file" accept=".csv,.pdf,text/csv,application/pdf" class="hidden"></div>';
     }
 
     var totals={}; expenses.forEach(function(t){var c=SPEND_CATS[t.category]?t.category:'other'; totals[c]=(totals[c]||0)+(+t.amount||0);});
@@ -1030,13 +1033,14 @@
     grad+=')';
 
     var donut='<div class="card"><div class="spend-total"><div class="st-v">'+money(totalSpent)+'</div>'+
-      '<div class="st-k">Total spent'+(prevTotal?' · <span style="font-weight:700;color:'+(deltaPct<=0?'var(--good)':'var(--danger)')+'">'+(deltaPct<=0?'↓':'↑')+' '+Math.abs(deltaPct)+'% vs last month</span>':'')+'</div></div>'+
+      '<div class="st-k">Total spent'+(prevTotal?' · <span style="font-weight:700;color:'+(deltaPct<=0?'var(--good)':'var(--danger)')+'">'+(deltaPct<=0?'↓':'↑')+' '+Math.abs(deltaPct)+'% vs last month</span>':'')+'</div>'+
+      (income>0?'<div style="font-size:13px;font-weight:700;color:var(--good);margin-top:4px">＋'+money(income)+' came in 💚</div>':'')+'</div>'+
       '<div class="donut-wrap"><div class="donut" style="background:'+grad+'"><div class="dc"><div class="dv">'+moneyShort(totalSpent)+'</div><div class="dk">spent</div></div></div>'+
       '<div class="legend">'+cats.map(function(c){var p=Math.round(totals[c]/totalSpent*100); return '<div class="lr"><span class="dot" style="background:'+SPEND_CATS[c].color+'"></span><span class="ll">'+SPEND_CATS[c].label+'</span><span class="lp">'+p+'%</span></div>';}).join('')+'</div></div></div>';
 
     var actions='<div class="stat-row" style="margin-top:14px"><button class="btn sm" data-nav-go="/money/new" style="flex:1">＋ Add</button>'+
       '<button class="btn ghost sm" id="imp-btn" style="flex:1">⬆️ Import</button>'+
-      '<button class="btn ghost sm" data-nav-go="/money/budgets" style="flex:1">🎯 Budgets</button></div><input type="file" id="csv-file" accept=".csv,text/csv" class="hidden">';
+      '<button class="btn ghost sm" data-nav-go="/money/budgets" style="flex:1">🎯 Budgets</button></div><input type="file" id="csv-file" accept=".csv,.pdf,text/csv,application/pdf" class="hidden">';
 
     var over=cats.filter(function(c){return budgets[c]&&totals[c]>budgets[c];});
     var flags=over.length? '<div class="card" style="margin-top:14px;border-color:var(--danger)"><div style="font-weight:700;color:var(--danger);margin-bottom:4px">⚠️ Over budget this month</div>'+
@@ -1045,7 +1049,7 @@
     var recent=monthTx.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')}).slice(0,40);
     var txList='<div class="section-label">🧾 Transactions</div><div class="card">'+recent.map(function(t){var c=SPEND_CATS[t.category]||SPEND_CATS.other; var inc=t.type==='income';
       return '<div class="tx-row" data-txopen="'+t.id+'"><div class="bubble" style="width:40px;height:40px;font-size:17px;background:'+c.color+'22">'+c.icon+'</div>'+
-        '<div class="meta"><div class="td">'+esc(t.desc||c.label)+'</div><div class="tc">'+c.label+' · '+fmtDate(t.date)+'</div></div>'+
+        '<div class="meta"><div class="td">'+esc(t.desc||c.label)+(t.website?' <span class="txlink" data-txweb="'+esc(t.website)+'">🔗</span>':'')+'</div><div class="tc">'+c.label+' · '+fmtDate(t.date)+'</div></div>'+
         '<div class="ta '+(inc?'inc':'')+'">'+(inc?'+':'−')+money(t.amount).replace(settings.currency+' ',settings.currency)+'</div></div>';}).join('')+'</div>';
 
     return '<div class="screen-head" style="margin-bottom:8px"><div><h2 class="title">Spending 💸</h2><div class="sub">Where your money goes.</div></div></div>'+monthNav+donut+actions+flags+txList;
@@ -1098,7 +1102,7 @@
     return today();
   }
   function importCSV(text){
-    var rows=parseCSV(text); if(!rows.length) return {added:0,month:null};
+    var rows=parseCSV(text); if(!rows.length) return [];
     var header=rows[0].map(function(h){return (h||'').trim().toLowerCase()});
     var di=-1,ei=-1,ai=-1,debi=-1,credi=-1;
     header.forEach(function(h,idx){
@@ -1110,18 +1114,109 @@
     });
     var hasHeader=(di>-1||ai>-1||ei>-1||debi>-1||credi>-1);
     var start=hasHeader?1:0; if(!hasHeader){di=0;ei=1;ai=2;}
-    var added=0, lastMonth=null;
+    var out=[];
     for(var i=start;i<rows.length;i++){var r=rows[i]; if(!r)continue;
       var desc=((ei>-1&&r[ei])||'').trim(); var amt=0,type='expense';
       if(debi>-1||credi>-1){var deb=parseAmt(debi>-1?r[debi]:''),cre=parseAmt(credi>-1?r[credi]:'');
         if(deb){amt=Math.abs(deb);type='expense';} else if(cre){amt=Math.abs(cre);type='income';} }
       else{var v=parseAmt(ai>-1?r[ai]:''); if(v==null)continue; if(v<0){amt=Math.abs(v);type='expense';}else{amt=v;type='income';}}
       if(!amt) continue;
-      var date=parseDate(di>-1?r[di]:''); lastMonth=monthKey(date);
-      tx.push({id:uid(),date:date,desc:desc||'Transaction',amount:amt,type:type,category:categorize(desc)}); added++;
+      var date=parseDate(di>-1?r[di]:''); var en=enrich(desc);
+      out.push({id:uid(),date:date,desc:(en?en.name:desc)||'Transaction',amount:amt,type:type,category:en?en.cat:categorize(desc),website:en?en.web:''});
     }
-    if(added) save(K.tx,tx);
-    return {added:added,month:lastMonth};
+    return out;
+  }
+
+  /* ---------- merchant enrichment (built-in, no internet needed) ---------- */
+  var MERCHANTS=[
+    {k:['amazon prime'],name:'Amazon Prime',web:'amazon.com',cat:'entertainment'},
+    {k:['amazon'],name:'Amazon',web:'amazon.com',cat:'shopping'},
+    {k:['netflix'],name:'Netflix',web:'netflix.com',cat:'entertainment'},
+    {k:['spotify'],name:'Spotify',web:'spotify.com',cat:'entertainment'},
+    {k:['showmax'],name:'Showmax',web:'showmax.com',cat:'entertainment'},
+    {k:['dstv','multichoice'],name:'DStv',web:'dstv.com',cat:'entertainment'},
+    {k:['google one','youtube','google'],name:'Google',web:'google.com',cat:'subscriptions'},
+    {k:['apple.com','itunes'],name:'Apple',web:'apple.com',cat:'subscriptions'},
+    {k:['uber eats'],name:'Uber Eats',web:'ubereats.com',cat:'eatingout'},
+    {k:['uber'],name:'Uber',web:'uber.com',cat:'transport'},
+    {k:['bolt'],name:'Bolt',web:'bolt.eu',cat:'transport'},
+    {k:['checkers'],name:'Checkers',web:'checkers.co.za',cat:'groceries'},
+    {k:['woolworths','woolies'],name:'Woolworths',web:'woolworths.co.za',cat:'groceries'},
+    {k:['pick n pay','picknpay','pnp'],name:'Pick n Pay',web:'pnp.co.za',cat:'groceries'},
+    {k:['spar'],name:'Spar',web:'spar.co.za',cat:'groceries'},
+    {k:['shoprite'],name:'Shoprite',web:'shoprite.co.za',cat:'groceries'},
+    {k:['dischem','dis-chem'],name:'Dis-Chem',web:'dischem.co.za',cat:'health'},
+    {k:['clicks'],name:'Clicks',web:'clicks.co.za',cat:'health'},
+    {k:['engen'],name:'Engen',web:'engen.co.za',cat:'transport'},
+    {k:['shell'],name:'Shell',web:'shell.co.za',cat:'transport'},
+    {k:['sasol'],name:'Sasol',web:'sasol.com',cat:'transport'},
+    {k:['takealot'],name:'Takealot',web:'takealot.com',cat:'shopping'},
+    {k:['superbalist'],name:'Superbalist',web:'superbalist.com',cat:'shopping'},
+    {k:['mr price','mrp'],name:'Mr Price',web:'mrp.com',cat:'shopping'},
+    {k:['goldwagen'],name:'Goldwagen',web:'goldwagen.com',cat:'transport'},
+    {k:['pirate motor','motor spares'],name:'Motor Spares',web:'',cat:'transport'},
+    {k:['nandos','nando'],name:'Nando’s',web:'nandos.co.za',cat:'eatingout'},
+    {k:['kfc'],name:'KFC',web:'kfc.co.za',cat:'eatingout'},
+    {k:['mcdonald'],name:'McDonald’s',web:'mcdonalds.co.za',cat:'eatingout'},
+    {k:['steers'],name:'Steers',web:'steers.co.za',cat:'eatingout'},
+    {k:['vodacom'],name:'Vodacom',web:'vodacom.co.za',cat:'bills'},
+    {k:['mtn'],name:'MTN',web:'mtn.co.za',cat:'bills'},
+    {k:['telkom'],name:'Telkom',web:'telkom.co.za',cat:'bills'},
+    {k:['afrihost'],name:'Afrihost',web:'afrihost.com',cat:'bills'},
+    {k:['canna'],name:'Canna Kingdom',web:'',cat:'other'}
+  ];
+  function enrich(desc){var d=(desc||'').toLowerCase();
+    for(var i=0;i<MERCHANTS.length;i++){var m=MERCHANTS[i]; for(var j=0;j<m.k.length;j++){ if(d.indexOf(m.k[j])>-1) return m; }}
+    return null;
+  }
+  function cleanDesc(desc){ return (desc||'')
+    .replace(/\d{6}\*\d{4}\s*\d{0,2}\s*[A-Za-z]{0,3}/g,'')
+    .replace(/^POS Purchase\s*/i,'').replace(/^FNB App\s*/i,'').replace(/#Int Pymt Fee-?/ig,'')
+    .replace(/^#?Service Fees?\s*#?/i,'Fee: ').replace(/\bDI\b|\bDi\b/g,'').replace(/\s{2,}/g,' ').trim(); }
+
+  /* ---------- PDF bank-statement reader (lazy-loads pdf.js) ---------- */
+  function ensurePdfjs(cb){
+    if(window.pdfjsLib){ cb(); return; }
+    var s=document.createElement('script'); s.src='./vendor/pdf.min.js';
+    s.onload=function(){ try{ pdfjsLib.GlobalWorkerOptions.workerSrc='./vendor/pdf.worker.min.js'; }catch(e){} cb(); };
+    s.onerror=function(){ toast('Couldn’t load the PDF reader'); };
+    document.head.appendChild(s);
+  }
+  function parsePdfStatement(buf){
+    return pdfjsLib.getDocument({data:buf}).promise.then(function(pdf){
+      var lines=[], fullText='', pages=[]; for(var p=1;p<=pdf.numPages;p++) pages.push(p);
+      return pages.reduce(function(pr,pn){ return pr.then(function(){ return pdf.getPage(pn).then(function(page){ return page.getTextContent().then(function(tc){
+        var rows={}; tc.items.forEach(function(it){ var y=Math.round(it.transform[5]); (rows[y]=rows[y]||[]).push({x:it.transform[4],s:it.str}); });
+        Object.keys(rows).map(Number).sort(function(a,b){return b-a;}).forEach(function(y){
+          var line=rows[y].sort(function(a,b){return a.x-b.x;}).map(function(t){return t.s;}).join(' ').replace(/\s+/g,' ').trim();
+          if(line){ lines.push(line); fullText+=line+'\n'; }
+        });
+      }); }); }); }, Promise.resolve()).then(function(){
+        var ym=fullText.match(/\b(20\d{2})\b/); var year=ym?+ym[1]:new Date().getFullYear();
+        var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+        var out=[];
+        lines.forEach(function(raw){
+          var line=raw.replace(/(\d)\s+Cr\b/g,'$1Cr');
+          var m=line.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+(.+?)\s+([\d,]+\.\d{2}(?:Cr)?)\s+([\d,]+\.\d{2}Cr)\b/);
+          if(!m) return;
+          var mon=MON[m[2].toLowerCase()]; if(!mon) return;
+          var amtTok=m[4]; var isCr=/Cr$/.test(amtTok); var amt=parseFloat(amtTok.replace(/[^0-9.]/g,'')); if(!amt) return;
+          var date=year+'-'+String(mon).padStart(2,'0')+'-'+String(+m[1]).padStart(2,'0');
+          var descRaw=m[3]; var en=enrich(descRaw);
+          out.push({id:uid(),date:date,desc:(en?en.name:cleanDesc(descRaw))||'Transaction',amount:amt,
+            type:isCr?'income':'expense',category:en?en.cat:categorize(descRaw),website:en?en.web:''});
+        });
+        return out;
+      });
+    });
+  }
+  function commitImported(items){
+    if(!items||!items.length){ toast('No transactions found in that file 😕'); return; }
+    items.forEach(function(t){ tx.push(t); });
+    save(K.tx,tx);
+    var last=items[items.length-1].date; if(last) spendMonth=monthKey(last);
+    var inc=items.filter(function(t){return t.type==='income'}).length;
+    toast('Imported '+items.length+' item'+(items.length>1?'s':'')+(inc?' ('+inc+' income)':'')+' ✨'); render();
   }
 
   /* ---------- To-Do ---------- */
@@ -1396,11 +1491,14 @@
     document.querySelectorAll('[data-mshift]').forEach(function(el){el.onclick=function(){spendMonth=shiftMonth(spendMonth,parseInt(el.getAttribute('data-mshift'),10)); render();}});
     var impBtn=$('#imp-btn'), csvFile=$('#csv-file');
     if(impBtn&&csvFile){ impBtn.onclick=function(){csvFile.click()}; csvFile.onchange=function(){var f=csvFile.files[0]; if(!f)return;
-      var rd=new FileReader(); rd.onload=function(){ var res=importCSV(rd.result);
-        if(res.added){ if(res.month) spendMonth=res.month; toast('Imported '+res.added+' transaction'+(res.added>1?'s':'')+' ✨'); render(); }
-        else toast('No transactions found in that file 😕'); };
-      rd.readAsText(f); }; }
+      var isPdf=/\.pdf$/i.test(f.name)||/pdf/i.test(f.type||'');
+      if(isPdf){ toast('Reading your statement… 📄'); ensurePdfjs(function(){ var rd=new FileReader();
+        rd.onload=function(){ parsePdfStatement(rd.result).then(commitImported).catch(function(){ toast('Couldn’t read that PDF — is it a scan/photo? 😕'); }); };
+        rd.readAsArrayBuffer(f); }); }
+      else { var rd=new FileReader(); rd.onload=function(){ commitImported(importCSV(rd.result)); }; rd.readAsText(f); }
+      csvFile.value=''; }; }
     document.querySelectorAll('[data-txopen]').forEach(function(el){el.onclick=function(){go('/money/edit/'+el.getAttribute('data-txopen'))}});
+    document.querySelectorAll('[data-txweb]').forEach(function(el){el.onclick=function(ev){ev.stopPropagation(); var u=el.getAttribute('data-txweb'); if(!/^https?:\/\//i.test(u))u='https://'+u; window.open(u,'_blank','noopener');};});
 
     var txform=$('#txform'); if(txform){
       var descEl=$('#tx-desc'), catEl=$('#tx-cat'), catTouched=false;

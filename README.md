@@ -80,4 +80,10 @@ high-contrast and legible.
 **Smoke Log** 🌿: tap Joint / Pen / Bong, pick hits (1–10) — daily & weekly tally, per-method
 breakdown, history. **Profile picture** in More (shows on Home + lock screen).
 
+**Bank imports**: Spending imports **PDF** statements (via a vendored, lazy-loaded pdf.js in
+`vendor/`) as well as CSV. Parses FNB-style rows (date / description / amount / Cr), detects
+income vs expense (salary lands as income), auto-categorises, and enriches known merchants with
+a nicer name + website from a built-in list (no internet lookup). Tuned to FNB; other layouts
+may need adjustment.
+
 The app lives in `index.html` (self-contained) with `manifest.webmanifest`, `sw.js`, and `icons/`.
