@@ -410,7 +410,8 @@
   .smoke-mini .sm b{color:var(--ink)}
 
   /* Bottom nav */
-  .nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; padding:0 0 max(12px,env(safe-area-inset-bottom))}
+  .nav{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; padding:0 0 max(12px,env(safe-area-inset-bottom));
+    transform:translateZ(0); -webkit-transform:translateZ(0); will-change:transform; backface-visibility:hidden}
   .nav-inner{display:flex; align-items:center; justify-content:space-around; gap:2px; width:min(500px,calc(100% - 24px));
     background:var(--nav-bg); border:1px solid var(--border); border-radius:26px; padding:9px 10px; margin:0 12px;
     box-shadow:var(--shadow); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px)}
@@ -503,7 +504,7 @@
   var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', smoke:'lifeindex.smoke', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-  var APP_VERSION='v9 · 13 Aug';
+  var APP_VERSION='v10 · 13 Aug';
   var settings=load(K.settings,{name:'Kelly', currency:'R', salaryKeywords:['kiron']});
   var vault=load(K.vault,[]);
   var recipes=load(K.recipes,[]);
@@ -646,22 +647,28 @@
 
   /* ---------- screens ---------- */
   function screenHome(){
-    var items=[];
-    vault.forEach(function(e){ if(e.renewalDate && !e.autoDebit){ var n=daysUntil(e.renewalDate); if(n!=null&&n>=0){ var c=CAT[e.category]||CAT.other;
-      items.push({icon:c.icon,b:c.b,title:e.title,label:(e.category==='insurance'&&e.subtype)?e.subtype+' insurance':c.label,days:n}); } } });
-    var np=nextPeriodInfo(); if(np&&np.days!=null&&np.days>=0&&np.days<=45) items.push({icon:'🌸',b:'b-pink',title:'Period',label:'Likely to start',days:np.days});
-    reminders.forEach(function(r){ var nx=remNext(r); var n=daysUntil(nx); if(n!=null&&n>=0&&n<=45){ var ty=REM_TYPE[r.type]||REM_TYPE.reminder; items.push({icon:ty.icon,b:'b-pink',title:r.title,label:ty.label,days:n}); } });
-    items.sort(function(a,b){return a.days-b.days}); items=items.slice(0,5);
+    // Coming up — reminders + vault renewal nudges (dates only, no amounts, no cycle info)
+    var up=[];
+    reminders.forEach(function(r){ var nx=remNext(r); var n=daysUntil(nx); if(n!=null&&n>=0&&n<=60){ var ty=REM_TYPE[r.type]||REM_TYPE.reminder; up.push({icon:ty.icon,b:'b-pink',title:r.title,label:ty.label,days:n}); } });
+    vault.forEach(function(e){ if(e.renewalDate && !e.autoDebit){ var n=daysUntil(e.renewalDate); if(n!=null&&n>=0&&n<=60){ var c=CAT[e.category]||CAT.other;
+      up.push({icon:c.icon,b:c.b,title:e.title,label:(e.category==='insurance'&&e.subtype)?e.subtype+' insurance':c.label,days:n}); } } });
+    up.sort(function(a,b){return a.days-b.days}); up=up.slice(0,6);
+    var upCard = up.length ? '<div class="card"><div class="snap">'+up.map(function(x){
+        return '<div class="snap-row"><div class="bubble '+x.b+'">'+x.icon+'</div><div class="txt"><div class="lead">'+esc(x.title)+'</div><div class="big">'+esc(x.label)+'</div></div><span class="pill '+(x.days<=7?'soon':'')+'"><span class="when">'+whenText(x.days)+'</span></span></div>';
+      }).join('')+'</div></div>'
+      : '<div class="card"><div class="empty" style="padding:22px 10px"><div class="em">🌙</div><h3>All calm</h3><p>No birthdays, events or renewals coming up. Add reminders in your Planner.</p></div></div>';
+
     var monthly=vault.reduce(function(s,e){return s+(Number(e.monthlyCost)||0)},0);
     var thisMonthKey=(function(){var n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');})();
     var spentThisMonth=tx.filter(function(t){return (t.date||'').slice(0,7)===thisMonthKey && t.type==='expense'}).reduce(function(s,t){return s+(Number(t.amount)||0)},0);
+    var moneyCard='<div class="card"><div class="stat-row" style="margin:0">'+
+      '<div class="stat" data-nav-go="/money" style="cursor:pointer"><div class="k">Spent this month</div><div class="v">'+money(spentThisMonth).replace(settings.currency,settings.currency+' ')+'</div></div>'+
+      '<div class="stat"><div class="k">Monthly bills</div><div class="v">'+money(monthly).replace(settings.currency,settings.currency+' ')+'</div></div></div></div>';
 
-    var snap = items.length ? items.map(function(x){
-      return '<div class="snap-row"><div class="bubble '+x.b+'">'+x.icon+'</div>'+
-        '<div class="txt"><div class="lead">'+esc(x.title)+'</div>'+
-        '<div class="big">'+esc(x.label)+'</div></div>'+
-        '<span class="pill '+(x.days<=7?'soon':'')+'"><span class="when">'+whenText(x.days)+'</span></span></div>';
-    }).join('') : '<div class="empty" style="padding:26px 10px"><div class="em">🌙</div><h3>All calm</h3><p>Nothing due soon. Add things to your Vault and reminders will appear here.</p></div>';
+    var np=nextPeriodInfo();
+    var bodyCard = np ? '<div class="card" data-nav-go="/body" style="cursor:pointer"><div class="snap"><div class="snap-row"><div class="bubble b-pink">🌸</div>'+
+      '<div class="txt"><div class="lead">Next period</div><div class="big">'+(np.days>=0?'Likely '+whenText(np.days):'expected now')+'</div></div>'+
+      '<span class="pill '+(np.days<=5?'soon':'')+'">'+fmtDate(np.date)+'</span></div></div></div>' : '';
 
     return ''+
     '<div class="appbar"><div class="brand">Life Index <span class="spk">✨</span></div>'+
@@ -669,13 +676,9 @@
     '<div class="greet"><p class="hi">'+greeting()+'</p><div class="name">'+esc(settings.name||'you')+' ✨</div>'+
       '<div class="sub">Here’s your life, beautifully in order.</div></div>'+
 
-    '<div class="section-label">🔮 Today’s Snapshot</div>'+
-    '<div class="card"><div class="snap">'+snap+'</div>'+
-      '<div class="stat-row"><div class="stat" data-nav-go="/money" style="cursor:pointer"><div class="k">Spent this month</div><div class="v">'+money(spentThisMonth).replace(settings.currency,settings.currency+' ')+'</div></div>'+
-      '<div class="stat"><div class="k">Monthly bills</div><div class="v">'+money(monthly).replace(settings.currency,settings.currency+' ')+'</div></div></div>'+
-    '</div>'+
-
-    '';
+    '<div class="section-label">🔔 Coming up</div>'+ upCard +
+    '<div class="section-label">💸 Your month</div>'+ moneyCard +
+    (np ? '<div class="section-label">🌸 Your body</div>'+ bodyCard : '');
   }
 
   var vaultFilter='all';
