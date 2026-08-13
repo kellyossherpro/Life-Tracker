@@ -1198,23 +1198,33 @@
     return pdfjsLib.getDocument({data:buf}).promise.then(function(pdf){
       var lines=[], fullText='', pages=[]; for(var p=1;p<=pdf.numPages;p++) pages.push(p);
       return pages.reduce(function(pr,pn){ return pr.then(function(){ return pdf.getPage(pn).then(function(page){ return page.getTextContent().then(function(tc){
-        var rows={}; tc.items.forEach(function(it){ var y=Math.round(it.transform[5]); (rows[y]=rows[y]||[]).push({x:it.transform[4],s:it.str}); });
-        Object.keys(rows).map(Number).sort(function(a,b){return b-a;}).forEach(function(y){
-          var line=rows[y].sort(function(a,b){return a.x-b.x;}).map(function(t){return t.s;}).join(' ').replace(/\s+/g,' ').trim();
-          if(line){ lines.push(line); fullText+=line+'\n'; }
+        var items=[]; tc.items.forEach(function(it){ if((it.str||'').trim()!=='') items.push({x:it.transform[4], y:it.transform[5], s:it.str}); });
+        items.sort(function(a,b){ return (b.y-a.y) || (a.x-b.x); });
+        var cur=null;                      // cluster items into visual rows, tolerating small baseline wobble
+        items.forEach(function(it){
+          if(cur && Math.abs(it.y-cur.lastY)<=3.2){ cur.items.push(it); cur.lastY=it.y; }
+          else { if(cur){ cur.items.sort(function(a,b){return a.x-b.x;}); var l=cur.items.map(function(t){return t.s;}).join(' ').replace(/\s+/g,' ').trim(); if(l){lines.push(l); fullText+=l+'\n';} }
+                 cur={lastY:it.y, items:[it]}; }
         });
+        if(cur){ cur.items.sort(function(a,b){return a.x-b.x;}); var l2=cur.items.map(function(t){return t.s;}).join(' ').replace(/\s+/g,' ').trim(); if(l2){lines.push(l2); fullText+=l2+'\n';} }
       }); }); }); }, Promise.resolve()).then(function(){
         var ym=fullText.match(/\b(20\d{2})\b/); var year=ym?+ym[1]:new Date().getFullYear();
         var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
-        var out=[];
+        var out=[], moneyRe=/[\d,]+\.\d{2}(?:Cr|Dr)?/g;
         lines.forEach(function(raw){
-          var line=raw.replace(/(\d)\s+Cr\b/g,'$1Cr');
-          var m=line.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+(.+?)\s+([\d,]+\.\d{2}(?:Cr)?)\s+([\d,]+\.\d{2}Cr)\b/);
-          if(!m) return;
-          var mon=MON[m[2].toLowerCase()]; if(!mon) return;
-          var amtTok=m[4]; var isCr=/Cr$/.test(amtTok); var amt=parseFloat(amtTok.replace(/[^0-9.]/g,'')); if(!amt) return;
-          var date=year+'-'+String(mon).padStart(2,'0')+'-'+String(+m[1]).padStart(2,'0');
-          var descRaw=m[3]; var en=enrich(descRaw); var type=isCr?classifyCredit(descRaw):'expense';
+          var line=raw.replace(/(\d)\s+(Cr|Dr)\b/g,'$1$2');
+          var dm=line.match(/^(\d{1,2})\s+([A-Za-z]{3})\b/); if(!dm) return;   // must start with a date
+          var mon=MON[dm[2].toLowerCase()]; if(!mon) return;
+          var monies=line.match(moneyRe); if(!monies) return;
+          var balIdx=-1; for(var i=monies.length-1;i>=0;i--){ if(/Cr$|Dr$/.test(monies[i])){balIdx=i;break;} }
+          if(balIdx<0 && monies.length>=2) balIdx=monies.length-1;                // fallback: last = balance
+          if(balIdx<=0) return;                                                   // need an amount before the balance
+          var amtTok=monies[balIdx-1]; var isCr=/Cr$/.test(amtTok);
+          var amt=parseFloat(amtTok.replace(/[^0-9.]/g,'')); if(!amt) return;
+          var firstIdx=line.indexOf(monies[0]);
+          var descRaw=line.slice(dm[0].length, firstIdx).replace(/\d{6}\*\d{4}\s*\d{0,2}\s*[A-Za-z]{0,3}/g,'').replace(/^\s*20\d{2}\s*/,'').replace(/\s{2,}/g,' ').trim();
+          var date=year+'-'+String(mon).padStart(2,'0')+'-'+String(+dm[1]).padStart(2,'0');
+          var en=enrich(descRaw); var type=isCr?classifyCredit(descRaw):'expense';
           out.push({id:uid(),date:date,desc:(en?en.name:cleanDesc(descRaw))||'Transaction',amount:amt,
             type:type,category:en?en.cat:categorize(descRaw),website:en?en.web:''});
         });
