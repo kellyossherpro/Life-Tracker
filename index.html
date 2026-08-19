@@ -503,10 +503,10 @@
   var app=$('#app');
 
   /* ---------- storage ---------- */
-  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', smoke:'lifeindex.smoke', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
+  var K={vault:'lifeindex.vault', recipes:'lifeindex.recipes', body:'lifeindex.body', tx:'lifeindex.tx', budgets:'lifeindex.budgets', todos:'lifeindex.todos', reminders:'lifeindex.reminders', habits:'lifeindex.habits', smoke:'lifeindex.smoke', car:'lifeindex.car', carLog:'lifeindex.carLog', settings:'lifeindex.settings', seeded:'lifeindex.seeded', seededTx:'lifeindex.seededTx'};
   function load(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}}
   function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-  var APP_VERSION='v12 · 13 Aug';
+  var APP_VERSION='v13 · 13 Aug';
   var settings=load(K.settings,{name:'Kelly', currency:'R', salaryKeywords:['kiron']});
   var vault=load(K.vault,[]);
   var recipes=load(K.recipes,[]);
@@ -519,6 +519,9 @@
   var habits=load(K.habits,[]);
   var smoke=load(K.smoke,[]);
   var SMOKE_METHODS={joint:{l:'Joint',i:'🚬'},pen:{l:'Pen',i:'💨'},bong:{l:'Bong',i:'🫧'}};
+  var car=load(K.car,{});
+  var carLog=load(K.carLog,[]);
+  var CAR_TYPES={fuel:{l:'Petrol',i:'⛽'},service:{l:'Service',i:'🔧'},oil:{l:'Oil',i:'🛢️'},tyres:{l:'Tyres',i:'🛞'},repair:{l:'Repair',i:'🔩'},licence:{l:'Licence disc',i:'🪪'},wash:{l:'Wash',i:'🫧'},other:{l:'Other',i:'🚗'}};
 
   var SPEND_CATS={
     groceries:{label:'Groceries',icon:'🛒',color:'#8E6BFF'},
@@ -561,6 +564,14 @@
     reminders=[{id:uid(),type:'reminder',title:'Pay rent',date:(function(){var t=new Date();t.setDate(t.getDate()+5);return t.toISOString().slice(0,10);})(),note:'',todoId:''}];
     habits=[{id:uid(),name:'Drink water',emoji:'💧',history:{}},{id:uid(),name:'Move my body',emoji:'🏃',history:{}}];
     save(K.todos,todos); save(K.reminders,reminders); save(K.habits,habits); save('lifeindex.seededX',true);
+  }
+  if(!load('lifeindex.seededCar',false)){
+    car={name:'My Car',make:'',model:'',reg:'',colour:'',year:'',licenceExpiry:'2026-11-30',notes:''};
+    carLog=[
+      {id:uid(),type:'service',date:'2026-06-14',cost:2450,km:'58200',place:'Toyota',notes:'Minor service — oil, filters, brake check'},
+      {id:uid(),type:'fuel',date:'2026-07-14',cost:774.80,km:'58910',place:'Engen',notes:''}
+    ];
+    save(K.car,car); save(K.carLog,carLog); save('lifeindex.seededCar',true);
   }
 
   var CAT={
@@ -654,6 +665,7 @@
     reminders.forEach(function(r){ var nx=remNext(r); var n=daysUntil(nx); if(n!=null&&n>=0&&n<=60){ var ty=REM_TYPE[r.type]||REM_TYPE.reminder; up.push({icon:ty.icon,b:'b-pink',title:r.title,label:ty.label,days:n}); } });
     vault.forEach(function(e){ if(e.renewalDate && !e.autoDebit){ var n=daysUntil(e.renewalDate); if(n!=null&&n>=0&&n<=60){ var c=CAT[e.category]||CAT.other;
       up.push({icon:c.icon,b:c.b,title:e.title,label:(e.category==='insurance'&&e.subtype)?e.subtype+' insurance':c.label,days:n}); } } });
+    var _lic=licenceInfo(); if(_lic&&_lic.days!=null&&_lic.days>=0&&_lic.days<=35) up.push({icon:'🪪',b:'b-yellow',title:'Car licence disc',label:'Renew it',days:_lic.days,go:'/car'});
     up.sort(function(a,b){return a.days-b.days}); up=up.slice(0,6);
     var upCard = up.length ? '<div class="card"><div class="snap">'+up.map(function(x){
         return '<div class="snap-row"><div class="bubble '+x.b+'">'+x.icon+'</div><div class="txt"><div class="lead">'+esc(x.title)+'</div><div class="big">'+esc(x.label)+'</div></div><span class="pill '+(x.days<=7?'soon':'')+'"><span class="when">'+whenText(x.days)+'</span></span></div>';
@@ -811,6 +823,7 @@
       '<div class="snap-row" data-nav-go="/body" style="cursor:pointer"><div class="bubble b-yellow">🌸</div><div class="txt"><div class="big">My Body</div><div class="lead">Weight · periods · moods · Phase 4</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/planner" style="cursor:pointer"><div class="bubble b-lav">🗓️</div><div class="txt"><div class="big">Planner</div><div class="lead">To-do & reminders</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/habits" style="cursor:pointer"><div class="bubble b-mint">🔥</div><div class="txt"><div class="big">Habits</div><div class="lead">Daily streaks</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
+      '<div class="snap-row" data-nav-go="/car" style="cursor:pointer"><div class="bubble b-pink">🚗</div><div class="txt"><div class="big">My Car</div><div class="lead">Licence · services · fuel · km</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
       '<div class="snap-row" data-nav-go="/smoke" style="cursor:pointer"><div class="bubble b-mint">🌿</div><div class="txt"><div class="big">Smoke Log</div><div class="lead">Joints · pens · bongs</div></div><span class="pill" style="color:var(--good)">Live</span></div>'+
     '</div></div>'+
     '<div style="text-align:center;color:var(--ink-faint);font-size:12px;margin:22px 0 6px">Life Index '+APP_VERSION+' — made with 💜 for '+esc(settings.name)+'</div>';
@@ -1384,6 +1397,87 @@
     return '<div class="screen-head"><div><h2 class="title">Smoke Log 🌿</h2><div class="sub">Tap a method, then your hits.</div></div></div>'+hero+methods+history;
   }
 
+  /* ---------- My Car ---------- */
+  function licenceInfo(){ if(!car.licenceExpiry) return null;
+    var p=car.licenceExpiry.split('-'); var mm=+p[1],dd=+p[2]; if(!mm||!dd) return null;
+    var now=new Date(); now.setHours(0,0,0,0);
+    var cand=new Date(now.getFullYear(),mm-1,dd); if(cand<now) cand=new Date(now.getFullYear()+1,mm-1,dd);
+    var iso=cand.getFullYear()+'-'+String(mm).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+    return {date:iso, days:daysUntil(iso)};
+  }
+  function carKm(){ var m=0; carLog.forEach(function(e){ var k=parseInt(String(e.km||'').replace(/[^0-9]/g,''),10); if(k>m)m=k; }); return m; }
+  function carTitle(){ var t=[car.make,car.model].filter(Boolean).join(' '); return t || car.name || 'My Car'; }
+
+  function screenCar(){
+    var lic=licenceInfo(); var km=carKm();
+    var total=carLog.reduce(function(s,e){return s+(Number(e.cost)||0)},0);
+    var yr=String(new Date().getFullYear());
+    var fuelYear=carLog.filter(function(e){return e.type==='fuel'&&(e.date||'').slice(0,4)===yr}).reduce(function(s,e){return s+(Number(e.cost)||0)},0);
+
+    var profile='<div class="card v-card" data-nav-go="/car/profile" style="cursor:pointer"><div class="bubble b-pink">🚗</div>'+
+      '<div class="meta"><p class="t">'+esc(carTitle())+'</p><p class="p">'+esc([car.reg,car.colour,car.year].filter(Boolean).join(' · ')||'Tap to add your car’s details')+'</p></div>'+
+      '<div class="right"><div class="due">✏️ edit</div></div></div>';
+
+    var licCard = lic ? '<div class="card" data-nav-go="/car/profile" style="cursor:pointer"><div class="snap"><div class="snap-row" style="border:none">'+
+      '<div class="bubble b-yellow">🪪</div><div class="txt"><div class="lead">Licence disc</div><div class="big">Renew by '+fmtDate(lic.date)+'</div></div>'+
+      '<span class="pill '+(lic.days<=31?'soon':'')+'"><span class="when">'+whenText(lic.days)+'</span></span></div></div>'+
+      (lic.days<=31?'<div class="locknote" style="margin:8px 2px 0;color:var(--danger)">⏰ Renewal time — you asked for a month’s notice.</div>':'')+'</div>'
+      : '<div class="card"><div class="empty" style="padding:18px 10px"><div class="em">🪪</div><p>Add your licence disc expiry to get a month’s reminder before it’s due.</p><div class="center-x" style="margin-top:12px"><button class="btn sm" data-nav-go="/car/profile">Add licence date</button></div></div></div>';
+
+    var stats='<div class="stat-row" style="margin-top:14px">'+
+      '<div class="stat"><div class="k">Odometer</div><div class="v">'+(km?km.toLocaleString('en-ZA'):'—')+' <small>km</small></div></div>'+
+      '<div class="stat"><div class="k">Spent on car</div><div class="v">'+money(total).replace(settings.currency,settings.currency+' ')+'</div></div>'+
+      '<div class="stat"><div class="k">Fuel '+yr+'</div><div class="v">'+money(fuelYear).replace(settings.currency,settings.currency+' ')+'</div></div></div>';
+
+    var log = carLog.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')});
+    var timeline = log.length ? '<div class="section-label">🧾 Logbook</div><div class="card">'+log.map(function(e){var ty=CAR_TYPES[e.type]||CAR_TYPES.other;
+      return '<div class="log-row" data-carlogopen="'+e.id+'" style="cursor:pointer"><span style="font-size:20px;width:24px;text-align:center;flex:0 0 auto">'+ty.i+'</span>'+
+        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14.5px">'+ty.l+(e.place?' · '+esc(e.place):'')+'</div>'+
+        '<div style="font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+fmtDate(e.date)+(e.km?' · '+esc(e.km)+' km':'')+(e.notes?' · '+esc(e.notes):'')+'</div></div>'+
+        (Number(e.cost)?'<span class="lv" style="flex:0 0 auto">'+money(e.cost)+'</span>':'')+
+        '<button class="del" data-carlogdel="'+e.id+'" style="flex:0 0 auto">🗑</button></div>';}).join('')+'</div>'
+      : '<div class="section-label">🧾 Logbook</div><div class="card"><div class="empty" style="padding:22px"><div class="em">🔧</div><p>Log a service, petrol, oil — anything car-related — and it’ll build a full history here.</p></div></div>';
+
+    return '<div class="screen-head"><div><h2 class="title">My Car 🚗</h2><div class="sub">Everything about your car.</div></div>'+
+      '<button class="iconbtn" data-nav-go="/car/log/new">＋</button></div>'+
+      profile+'<div style="height:12px"></div>'+licCard+stats+
+      '<div class="form-actions" style="margin-top:16px"><button class="btn" data-nav-go="/car/log/new">＋ Log something</button></div>'+
+      timeline;
+  }
+
+  function screenCarProfile(){
+    var c=car||{};
+    return '<div class="screen-head"><div><h2 class="title">Car details 🚗</h2></div><button class="iconbtn" data-nav-go="/car">✕</button></div>'+
+    '<form id="carform">'+
+      '<div class="field"><label>Nickname</label><input name="name" placeholder="e.g. My Corolla" value="'+esc(c.name)+'"></div>'+
+      '<div class="row2"><div class="field"><label>Make</label><input name="make" placeholder="Toyota" value="'+esc(c.make)+'"></div>'+
+      '<div class="field"><label>Model</label><input name="model" placeholder="Corolla" value="'+esc(c.model)+'"></div></div>'+
+      '<div class="row2"><div class="field"><label>Registration</label><input name="reg" placeholder="ND 123-456" value="'+esc(c.reg)+'" autocapitalize="characters"></div>'+
+      '<div class="field"><label>Year</label><input name="year" inputmode="numeric" placeholder="2019" value="'+esc(c.year)+'"></div></div>'+
+      '<div class="field"><label>Colour</label><input name="colour" placeholder="Silver" value="'+esc(c.colour)+'"></div>'+
+      '<div class="field"><label>🪪 Licence disc expires</label><input name="licenceExpiry" type="date" value="'+esc(c.licenceExpiry)+'"><div class="locknote" style="margin-top:6px">You’ll get a reminder a month before, every year.</div></div>'+
+      '<div class="field"><label>Notes</label><textarea name="notes" placeholder="VIN, tyre size, anything to remember…">'+esc(c.notes)+'</textarea></div>'+
+      '<div class="form-actions"><button class="btn" type="submit">💾 Save car</button></div>'+
+    '</form>';
+  }
+
+  function screenCarLog(id){
+    var e = id? carLog.find(function(x){return x.id===id}) : {type:'fuel',date:today(),cost:'',km:'',place:'',notes:''};
+    if(!e) return screenNotFound();
+    var opts=Object.keys(CAR_TYPES).map(function(k){return '<option value="'+k+'" '+(e.type===k?'selected':'')+'>'+CAR_TYPES[k].i+'  '+CAR_TYPES[k].l+'</option>';}).join('');
+    return '<div class="screen-head"><div><h2 class="title">'+(id?'Edit entry':'Log car event')+'</h2></div><button class="iconbtn" data-nav-go="/car">✕</button></div>'+
+    '<form id="carlogform">'+
+      '<div class="field"><label>What was it?</label><select name="type">'+opts+'</select></div>'+
+      '<div class="row2"><div class="field"><label>Date</label><input name="date" type="date" value="'+esc(e.date)+'"></div>'+
+      '<div class="field"><label>Cost ('+settings.currency+')</label><input name="cost" inputmode="decimal" placeholder="0" value="'+(e.cost||'')+'"></div></div>'+
+      '<div class="row2"><div class="field"><label>Odometer (km)</label><input name="km" inputmode="numeric" placeholder="58900" value="'+esc(e.km)+'"></div>'+
+      '<div class="field"><label>Where / who</label><input name="place" placeholder="Engen / Toyota" value="'+esc(e.place)+'"></div></div>'+
+      '<div class="field"><label>Notes — what was done</label><textarea name="notes" placeholder="e.g. Oil & filter change, new wipers…">'+esc(e.notes)+'</textarea></div>'+
+      '<div class="form-actions"><button class="btn" type="submit">'+(id?'💾 Save':'✨ Add to logbook')+'</button>'+
+        (id?'<button class="btn danger" type="button" data-carlogdel2="'+id+'">Delete</button>':'')+'</div>'+
+    '</form>';
+  }
+
   /* ---------- render ---------- */
   function render(){
     var path=current();
@@ -1409,6 +1503,10 @@
     else if(seg[1]==='reminders'&&seg[2]==='edit'&&seg[3]) html=screenReminderForm(seg[3]);
     else if(path==='/habits') html=screenHabits();
     else if(path==='/smoke') html=screenSmoke();
+    else if(path==='/car') html=screenCar();
+    else if(path==='/car/profile') html=screenCarProfile();
+    else if(path==='/car/log/new') html=screenCarLog(null);
+    else if(seg[1]==='car'&&seg[2]==='log'&&seg[3]==='edit'&&seg[4]) html=screenCarLog(seg[4]);
     else if(path==='/more') html=screenMore();
     else html=screenNotFound();
 
@@ -1593,6 +1691,21 @@
       toast(SMOKE_METHODS[smokeMethod].i+' Logged '+n+' hit'+(n===1?'':'s')+' 🌿'); render();}});
     document.querySelectorAll('[data-smdel]').forEach(function(el){el.onclick=function(){smoke=smoke.filter(function(x){return x.id!==el.getAttribute('data-smdel')}); save(K.smoke,smoke); render();}});
 
+    // My Car
+    var carform=$('#carform'); if(carform){ carform.onsubmit=function(ev){ev.preventDefault(); var fd=new FormData(carform);
+      car={name:(fd.get('name')||'').trim(),make:(fd.get('make')||'').trim(),model:(fd.get('model')||'').trim(),reg:(fd.get('reg')||'').trim(),
+        colour:(fd.get('colour')||'').trim(),year:(fd.get('year')||'').trim(),licenceExpiry:fd.get('licenceExpiry')||'',notes:(fd.get('notes')||'').trim()};
+      save(K.car,car); toast('Car saved 💜'); go('/car'); }; }
+    document.querySelectorAll('[data-carlogopen]').forEach(function(el){el.onclick=function(){go('/car/log/edit/'+el.getAttribute('data-carlogopen'))}});
+    document.querySelectorAll('[data-carlogdel]').forEach(function(el){el.onclick=function(ev){ev.stopPropagation(); carLog=carLog.filter(function(x){return x.id!==el.getAttribute('data-carlogdel')}); save(K.carLog,carLog); render();}});
+    var carlogform=$('#carlogform'); if(carlogform){ carlogform.onsubmit=function(ev){ev.preventDefault(); var seg=path.split('/'); var id=(seg[1]==='car'&&seg[2]==='log'&&seg[3]==='edit')?seg[4]:null;
+      var fd=new FormData(carlogform); var obj={type:fd.get('type'),date:fd.get('date')||today(),cost:parseFloat(fd.get('cost'))||0,km:(fd.get('km')||'').trim(),place:(fd.get('place')||'').trim(),notes:(fd.get('notes')||'').trim()};
+      if(id){var i=carLog.findIndex(function(x){return x.id===id}); if(i>-1) carLog[i]=Object.assign({},carLog[i],obj);}
+      else{obj.id=uid(); carLog.unshift(obj);}
+      save(K.carLog,carLog); toast(id?'Saved 💜':'Added to logbook ✨'); go('/car'); };
+      var cd=$('[data-carlogdel2]',carlogform); if(cd) cd.onclick=function(){ if(confirm('Delete this log entry?')){var did=cd.getAttribute('data-carlogdel2'); carLog=carLog.filter(function(x){return x.id!==did}); save(K.carLog,carLog); toast('Deleted'); go('/car');} };
+    }
+
     // More screen
     var sn=$('#s-name'); if(sn) sn.onchange=function(){settings.name=sn.value.trim()||'you'; save(K.settings,settings); toast('Updated 💜')};
     var sSal=$('#s-salary'); if(sSal) sSal.onchange=function(){ settings.salaryKeywords=sSal.value.split(',').map(function(s){return s.trim();}).filter(Boolean); save(K.settings,settings); toast('Saved 💜'); };
@@ -1610,7 +1723,7 @@
   }
 
   function exportData(){
-    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes,body:body,tx:tx,budgets:budgets,todos:todos,reminders:reminders,habits:habits,smoke:smoke};
+    var payload={app:'Life Index',version:1,exportedAt:new Date().toISOString(),settings:settings,vault:vault,recipes:recipes,body:body,tx:tx,budgets:budgets,todos:todos,reminders:reminders,habits:habits,smoke:smoke,car:car,carLog:carLog};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='life-index-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
@@ -1625,8 +1738,9 @@
       if(Array.isArray(data.tx)) tx=data.tx; if(data.budgets&&typeof data.budgets==='object') budgets=data.budgets;
       if(Array.isArray(data.todos)) todos=data.todos; if(Array.isArray(data.reminders)) reminders=data.reminders; if(Array.isArray(data.habits)) habits=data.habits;
       if(Array.isArray(data.smoke)) smoke=data.smoke;
+      if(data.car&&typeof data.car==='object') car=data.car; if(Array.isArray(data.carLog)) carLog=data.carLog;
       if(data.settings) settings=Object.assign(settings,data.settings);
-      save(K.vault,vault); save(K.recipes,recipes); save(K.body,body); save(K.tx,tx); save(K.budgets,budgets); save(K.todos,todos); save(K.reminders,reminders); save(K.habits,habits); save(K.smoke,smoke); save(K.settings,settings); toast('Restored 💜'); go('/');
+      save(K.vault,vault); save(K.recipes,recipes); save(K.body,body); save(K.tx,tx); save(K.budgets,budgets); save(K.todos,todos); save(K.reminders,reminders); save(K.habits,habits); save(K.smoke,smoke); save(K.car,car); save(K.carLog,carLog); save(K.settings,settings); toast('Restored 💜'); go('/');
     }catch(e){toast('That file didn’t look right 😕')}};
     r.readAsText(f);
   }
@@ -1638,9 +1752,9 @@
       '<div class="qa-grid" style="margin-bottom:6px">'+
         '<div class="qa" data-q="/todos"><span class="e b-lav">📝</span>To-Do</div>'+
         '<div class="qa" data-q="/reminders/new"><span class="e b-pink">🔔</span>Reminder</div>'+
-        '<div class="qa" data-q="/smoke"><span class="e b-mint">🌿</span>Smoke</div>'+
+        '<div class="qa" data-q="/car/log/new"><span class="e b-pink">🚗</span>Car log</div>'+
         '<div class="qa" data-q="/money/new"><span class="e b-yellow">💸</span>Expense</div>'+
-        '<div class="qa" data-q="/habits"><span class="e b-pink">🔥</span>Habit</div>'+
+        '<div class="qa" data-q="/smoke"><span class="e b-mint">🌿</span>Smoke</div>'+
         '<div class="qa" data-q="/recipes/new"><span class="e b-lav">🍳</span>Recipe</div>'+
       '</div>';
     $('#backdrop').classList.add('open'); s.classList.add('open');
